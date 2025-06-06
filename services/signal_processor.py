@@ -4,7 +4,7 @@ import numpy as np
 
 
 class Signal_Receiver_TCP:
-    def __init__(self, host='______', port=_____):
+    def __init__(self, host='abcde', port=80):
         self.host = host
         self.port = port
         self.socket = None
@@ -83,10 +83,10 @@ class Signal_Receiver_TCP:
             self.is_connected = False
             print("Connection closed")
 
-
+'''
 # Example usage:
 if __name__ == "__main__":
-    receiver = Signal_Receiver_TCP()
+    ##receiver = Signal_Receiver_TCP()
 
     if receiver.connect():
         try:
@@ -102,3 +102,5 @@ if __name__ == "__main__":
             print("\nStopping receiver...")
         finally:
             receiver.close()
+
+'''
