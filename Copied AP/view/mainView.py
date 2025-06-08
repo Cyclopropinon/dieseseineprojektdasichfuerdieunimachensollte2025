@@ -32,7 +32,7 @@ class MainView(QMainWindow):
         # Set up the main window
         self.setWindowTitle("VeryCreativeProjectName")
         self.setGeometry(0, 0, 800, 600)
-        self.showFullScreen()  # Enters full screen mode
+        self.showMaximized()  # Enters max screen mode
 
         # Create central widget and layout
         central_widget = QWidget()
