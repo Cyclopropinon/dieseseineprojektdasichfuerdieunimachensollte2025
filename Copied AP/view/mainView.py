@@ -83,7 +83,7 @@ class MainView(QMainWindow):
         control_centre.addWidget(button_rms)
         control_centre.addWidget(select_channels_label)
 
-        imp_buttons = QVBoxLayout()
+        imp_buttons = QHBoxLayout()
         imp_buttons_widget = QWidget()
         imp_buttons_widget.setLayout(imp_buttons)
 
