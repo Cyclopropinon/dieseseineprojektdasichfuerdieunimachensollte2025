@@ -39,13 +39,13 @@ class MainView(QMainWindow):
         self.setCentralWidget(central_widget)
 
         ## sets a kuhl border so we can see the dingsdas
-        #central_widget.setStyleSheet("border: 1px solid red;")
+        ##central_widget.setStyleSheet("border: 1px solid red;")
 
         main_vertical_layout = QVBoxLayout()
         central_widget.setLayout(main_vertical_layout)
 
-        top_bar_widget = QWidget()
         top_bar = QHBoxLayout()
+        top_bar_widget = QWidget()
         top_bar_widget.setLayout(top_bar)
         top_bar_widget.setFixedHeight(150)
 
@@ -60,18 +60,10 @@ class MainView(QMainWindow):
         on_off_butt = QPushButton("MAIN SWITCH")
         on_off_butt.setFixedSize(100, 100);
         on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
-        status_txt = QLabel("Status: CONNECTED")
-        ip_txt = QLabel("IP: 62.214.70.46:8080")
+        status_ip_txt = QLabel("Status: CONNECTED \n IP: 62.214.70.46:8080"  )
 
         main_button.addWidget(on_off_butt)
-        main_button_txt = QVBoxLayout()
-
-
-        main_button_txt.addWidget(status_txt)
-        main_button_txt.addWidget(ip_txt)
-
-
-        main_button.addLayout(main_button_txt)
+        main_button.addWidget(status_ip_txt)
 
         main_vertical_layout.addWidget(top_bar_widget)
 
@@ -84,11 +76,15 @@ class MainView(QMainWindow):
         control_centre_widget.setLayout(control_centre)
         control_centre_widget.setFixedWidth(250)
 
+        self.control_button = QPushButton("Start Plotting")
+        self.control_button.clicked.connect(self.toggle_plotting)
         button_rms = QPushButton("RMS Signal")
         button_raw = QPushButton("Raw Signal")
         button_filt = QPushButton("Filtered Signal")
         select_channels_label = QLabel("Select Channels")
         select_channels_label.setAlignment(Qt.AlignCenter)
+
+        control_centre.addWidget(self.control_button)
 
         control_centre.addWidget(button_raw)
         control_centre.addWidget(button_filt)
@@ -114,12 +110,12 @@ class MainView(QMainWindow):
         check_columns_1 = QVBoxLayout()
         check_columns_1_widget = QWidget()
         check_columns_1_widget.setLayout(check_columns_1)
-        check_columns_1_widget.setFixedWidth(50)
+        check_columns_1_widget.setFixedWidth(55)
 
         check_columns_2 = QVBoxLayout()
         check_columns_2_widget = QWidget()
         check_columns_2_widget.setLayout(check_columns_2)
-        check_columns_2_widget.setFixedWidth(50)
+        check_columns_2_widget.setFixedWidth(55)
 
 
 
@@ -143,10 +139,6 @@ class MainView(QMainWindow):
         horizontal_layout.addWidget(self.plot_widget)
 
         main_vertical_layout.addLayout(horizontal_layout)
-
-        self.control_button = QPushButton("Start Plotting")
-        self.control_button.clicked.connect(self.toggle_plotting)
-        main_vertical_layout.addWidget(self.control_button)
 
         self.view_model.data_updated.connect(self.plot_widget.update_data)
 
