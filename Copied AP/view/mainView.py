@@ -55,6 +55,9 @@ class MainView(QMainWindow):
         button_raw = QPushButton("Raw Signal")
         button_filt = QPushButton("Filtered Signal")
         select_channels_label = QLabel("Select Channels")
+        size_widget = QWidget()
+        size_widget.setLayout(top_bar)
+        size_widget.setFixedHeight(100)
 
         check_list = []
         for i in range(1, 33, 1):
@@ -69,7 +72,8 @@ class MainView(QMainWindow):
         spacer = QSpacerItem(1100,100, QSizePolicy.Minimum, QSizePolicy.Fixed)
         top_bar.addSpacerItem(spacer)
 
-        main_vertical_layout.addLayout(top_bar)
+
+        main_vertical_layout.addWidget(size_widget)
         main_vertical_layout.addLayout(horizontal_layout)
         main_vertical_layout.addWidget(self.plot_widget)
         horizontal_layout.addLayout(control_centre)
