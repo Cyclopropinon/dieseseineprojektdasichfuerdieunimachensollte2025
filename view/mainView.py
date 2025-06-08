@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QPushButton
 from PyQt5.QtCore import Qt
-from view.plotView import VisPyPlotWidget
+###from view.plotView import VisPyPlotWidget
 
 
 class MainView(QMainWindow):
@@ -59,3 +59,5 @@ class MainView(QMainWindow):
         else:
             self.control_button.setText("Stop Plotting")
             self.view_model.start_plotting()
+
+
