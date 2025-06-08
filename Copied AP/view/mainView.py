@@ -38,6 +38,9 @@ class MainView(QMainWindow):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
+        ## sets a kuhl border so we can see the dingsdas
+        central_widget.setStyleSheet("border: 1px solid red;")
+
         main_vertical_layout = QVBoxLayout()
         central_widget.setLayout(main_vertical_layout)
 
@@ -46,24 +49,34 @@ class MainView(QMainWindow):
         top_bar_widget.setLayout(top_bar)
         top_bar_widget.setFixedHeight(150)
 
+
         spacer = QSpacerItem(1100, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
         top_bar.addSpacerItem(spacer)
 
+        main_button = QHBoxLayout()
         main_button_widget = QWidget()
-        main_button = QVBoxLayout()
         main_button_widget.setLayout(main_button)
 
         on_off_butt = QPushButton("MAIN SWITCH")
+        on_off_butt.setFixedSize(100, 100);
+        on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen;")
         status_txt = QLabel("Status: CONNECTED")
         ip_txt = QLabel("IP: 62.214.70.46")
 
         main_button.addWidget(on_off_butt)
-        main_button.addWidget(status_txt)
-        main_button.addWidget(ip_txt)
+        main_button_txt = QVBoxLayout()
+        main_button_txt_widget = QWidget()
+        main_button_txt_widget.setLayout(main_button_txt)
 
-        top_bar.addWidget(main_button_widget)
+        main_button_txt.addWidget(status_txt)
+        main_button_txt.addWidget(ip_txt)
+
+
+        main_button.addWidget(main_button_txt_widget)
 
         main_vertical_layout.addWidget(top_bar_widget)
+
+        top_bar.addWidget(main_button_widget)
 
         horizontal_layout = QHBoxLayout()
         horizontal_layout_widget = QWidget()
