@@ -50,7 +50,7 @@ class MainView(QMainWindow):
         top_bar_widget.setFixedHeight(150)
 
 
-        spacer = QSpacerItem(1100, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        spacer = QSpacerItem(1150, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
         top_bar.addSpacerItem(spacer)
 
         main_button = QHBoxLayout()
@@ -78,6 +78,7 @@ class MainView(QMainWindow):
 
         self.control_button = QPushButton("Start Plotting")
         self.control_button.clicked.connect(self.toggle_plotting)
+        self.control_button.setFixedHeight(50)
         button_rms = QPushButton("RMS Signal")
         button_raw = QPushButton("Raw Signal")
         button_filt = QPushButton("Filtered Signal")
