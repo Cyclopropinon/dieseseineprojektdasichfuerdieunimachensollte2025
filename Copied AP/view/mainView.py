@@ -83,6 +83,7 @@ class MainView(QMainWindow):
         button_raw = QPushButton("Raw Signal")
         button_filt = QPushButton("Filtered Signal")
         select_channels_label = QLabel("Select Channels")
+        select_channels_label.setStyleSheet("border: 2px solid white")
         select_channels_label.setAlignment(Qt.AlignCenter)
 
         control_centre.addWidget(self.control_button)
