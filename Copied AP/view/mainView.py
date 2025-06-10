@@ -2,8 +2,12 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLab
     QSpacerItem, QSizePolicy, QCheckBox
 from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from .credits import CreditsDialog
 from PyQt5.QtGui import QMovie
+from .audio import AudioController
+import sys
+import os
 
 
 class MainView(QMainWindow):
@@ -51,9 +55,9 @@ class MainView(QMainWindow):
         top_bar_widget.setLayout(top_bar)
         top_bar_widget.setFixedHeight(150)
 
-        gif_box = QVBoxLayout()
+        self.gif_box = QVBoxLayout()
         gif_box_widget = QWidget()
-        gif_box_widget.setLayout(gif_box)
+        gif_box_widget.setLayout(self.gif_box)
 
         on_off_butt = QPushButton("MAIN SWITCH")
         on_off_butt.setFixedSize(100, 100);
@@ -79,8 +83,22 @@ class MainView(QMainWindow):
         self.movie.start()
 
 
-        gif_box.addWidget(gif)
-        gif_box.addWidget(status_ip_txt)
+        self.gif_box.addWidget(gif)
+        self.gif_box.addWidget(status_ip_txt)
+
+
+        ##
+        self.audio_file_path = os.path.join(os.getcwd(), "view/Nyan Cat.mp3")
+        self.audio_controller = AudioController(self.audio_file_path, parent=self)
+        self.init_window_ui()
+
+        self.audio_controller.audio_state_changed.connect(self.update_audio_button_ui)
+        self.audio_controller.volume_changed.connect(lambda vol: self.update_audio_button_ui(self.audio_controller.get_current_state()))
+
+        self.update_audio_button_ui(self.audio_controller.get_current_state())
+        self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
+        ##
+
 
         spacer = QSpacerItem(500, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
         top_bar.addSpacerItem(spacer)
@@ -203,3 +221,31 @@ class MainView(QMainWindow):
         # Show the dialog modally (blocks interaction with parent window until closed)
         credits_dialog.exec_()
 
+    def init_window_ui(self):
+        """
+        Initializes the main window's UI.
+        Assumes you already have a button (self.my_audio_button) in your layout.
+        """
+
+        # Your existing QPushButton instance
+        self.my_audio_button = QPushButton("Play")
+        self.gif_box.addWidget(self.my_audio_button)
+
+        # Connect your existing button's clicked signal to the AudioController's toggle method
+        self.my_audio_button.clicked.connect(self.audio_controller.toggle_playback)
+
+    def update_audio_button_ui(self, state: QMediaPlayer.State):
+        """
+        Updates the UI of the audio button based on the AudioController's state.
+        This method is a slot connected to the AudioController's audio_state_changed signal.
+        """
+        if state == QMediaPlayer.PlayingState:
+            if self.audio_controller.get_volume() != 0:
+                self.my_audio_button.setText("Mute")
+            else:
+                self.my_audio_button.setText("Unmute")
+                self.my_audio_button.setEnabled(True)
+        else:  # StoppedState, PausedState, BufferingState, etc.
+            self.my_audio_button.setText("Play")
+            # Only enable if media content was successfully loaded by the controller
+            self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
