@@ -2,8 +2,8 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLab
     QSpacerItem, QSizePolicy, QCheckBox
 from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
-from .funigifs import FuniWidget
 from .credits import CreditsDialog
+from PyQt5.QtGui import QMovie
 
 
 class MainView(QMainWindow):
@@ -60,7 +60,15 @@ class MainView(QMainWindow):
         on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
         status_ip_txt = QLabel("Status: CONNECTED \n IP: 62.214.70.46:8080"  )
 
-        gif = QWidget()
+        gif_path = "view/nyancat.gif"
+        self.movie = QMovie(gif_path)
+        gif = QLabel()
+        gif.setMovie(self.movie)
+        self.movie.start()
+
+
+
+
         gif_box.addWidget(gif)
         gif_box.addWidget(status_ip_txt)
 
