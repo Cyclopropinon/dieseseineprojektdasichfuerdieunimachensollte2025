@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLab
     QSpacerItem, QSizePolicy, QCheckBox
 from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
+from .funigifs import FuniWidget
 
 
 class MainView(QMainWindow):
@@ -39,7 +40,7 @@ class MainView(QMainWindow):
         self.setCentralWidget(central_widget)
 
         ## sets a kuhl border so we can see the dingsdas
-        ##central_widget.setStyleSheet("border: 1px solid red;")
+        central_widget.setStyleSheet("border: 1px solid red;")
 
         main_vertical_layout = QVBoxLayout()
         central_widget.setLayout(main_vertical_layout)
