@@ -41,8 +41,8 @@ class MainView(QMainWindow):
         ## sets a kuhl border so we can see the dingsdas
         ##central_widget.setStyleSheet("border: 1px solid red;")
 
-        main_vertical_layout = QVBoxLayout()
-        central_widget.setLayout(main_vertical_layout)
+        main_horizontal_layout = QHBoxLayout()
+        central_widget.setLayout(main_horizontal_layout)
 
         top_bar = QHBoxLayout()
         top_bar_widget = QWidget()
@@ -50,76 +50,76 @@ class MainView(QMainWindow):
         top_bar_widget.setFixedHeight(150)
 
 
-        spacer = QSpacerItem(1150, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
-        top_bar.addSpacerItem(spacer)
 
-        main_button = QHBoxLayout()
-        main_button_widget = QWidget()
-        main_button_widget.setLayout(main_button)
+
+        gif_button = QVBoxLayout()
+        gif_button_widget = QWidget()
+        gif_button_widget.setLayout(gif_button)
 
         on_off_butt = QPushButton("MAIN SWITCH")
         on_off_butt.setFixedSize(100, 100);
         on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
         status_ip_txt = QLabel("Status: CONNECTED \n IP: 62.214.70.46:8080"  )
 
-        main_button.addWidget(on_off_butt)
-        main_button.addWidget(status_ip_txt)
+        gif = QWidget()
+        gif_button.addWidget(gif)
+        gif_button.addWidget(status_ip_txt)
 
-        main_vertical_layout.addWidget(top_bar_widget)
+        spacer = QSpacerItem(500, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        top_bar.addSpacerItem(spacer)
+        top_bar.addWidget(on_off_butt)
+        top_bar.addWidget(gif_button_widget)
 
-        top_bar.addWidget(main_button_widget)
+        vertical_layout = QVBoxLayout()
 
-        horizontal_layout = QHBoxLayout()
+        vertical_layout.addWidget(top_bar_widget)
 
         control_centre = QVBoxLayout()
         control_centre_widget = QWidget()
         control_centre_widget.setLayout(control_centre)
-        control_centre_widget.setFixedWidth(250)
 
-        self.control_button = QPushButton("Start Plotting")
-        self.control_button.clicked.connect(self.toggle_plotting)
-        self.control_button.setFixedHeight(50)
+        control_box_1 = QVBoxLayout()
+        control_box_1_widget = QWidget()
+        control_box_1_widget.setLayout(control_box_1)
+        butt_plot_indi_ch = QPushButton("Plot Individual Channels")
+        butt_diff_ch = QPushButton("Differential Channels")
+        butt_freq_domain_anal = QPushButton("Frequency Domain Analysis")
+        butt_cross_ch_comp = QPushButton("Cross Channel Analysis")
+
+        control_box_1.addWidget(butt_plot_indi_ch)
+        control_box_1.addWidget(butt_diff_ch)
+        control_box_1.addWidget(butt_freq_domain_anal)
+        control_box_1.addWidget(butt_cross_ch_comp)
+
+        control_box_2 = QVBoxLayout()
+        control_box_2_widget = QWidget()
+        control_box_2_widget.setLayout(control_box_2)
         button_rms = QPushButton("RMS Signal")
         button_raw = QPushButton("Raw Signal")
         button_filt = QPushButton("Filtered Signal")
+
+        control_box_2.addWidget(button_raw)
+        control_box_2.addWidget(button_filt)
+        control_box_2.addWidget(button_rms)
+
+        control_box_3 = QVBoxLayout()
+        control_box_3_widget = QWidget()
+        control_box_3_widget.setLayout(control_box_3)
         select_channels_label = QLabel("Select Channels")
         select_channels_label.setStyleSheet("border: 2px solid white")
         select_channels_label.setAlignment(Qt.AlignCenter)
-
-        control_centre.addWidget(self.control_button)
-
-        control_centre.addWidget(button_raw)
-        control_centre.addWidget(button_filt)
-        control_centre.addWidget(button_rms)
-        control_centre.addWidget(select_channels_label)
-
-        imp_buttons = QHBoxLayout()
-
-        all = QPushButton("All")
-        all.setFixedSize(60, 40)
-        all.setStyleSheet("background-color: darkgrey; border: 2px solid black;")
-        none = QPushButton("None")
-        none.setFixedSize(60, 40)
-        none.setStyleSheet("background-color: darkgrey; border: 2px solid black;")
-
-        imp_buttons.addWidget(all)
-        imp_buttons.addWidget(none)
-
-        control_centre.addLayout(imp_buttons)
 
         check_group = QHBoxLayout()
 
         check_columns_1 = QVBoxLayout()
         check_columns_1_widget = QWidget()
         check_columns_1_widget.setLayout(check_columns_1)
-        check_columns_1_widget.setFixedWidth(55)
+        check_columns_1_widget.setFixedWidth(60)
 
         check_columns_2 = QVBoxLayout()
         check_columns_2_widget = QWidget()
         check_columns_2_widget.setLayout(check_columns_2)
-        check_columns_2_widget.setFixedWidth(55)
-
-
+        check_columns_2_widget.setFixedWidth(60)
 
         check_list = []
         for i in range(1, 33, 1):
@@ -128,19 +128,39 @@ class MainView(QMainWindow):
         for x in range(int(len(check_list) / 2)):
             check_columns_1.addWidget(check_list[x])
 
-
         for y in range(int(len(check_list) / 2), int(len(check_list))):
             check_columns_2.addWidget(check_list[y])
 
         check_group.addWidget(check_columns_1_widget)
         check_group.addWidget(check_columns_2_widget)
-        control_centre.addLayout(check_group)
+        control_box_3.addWidget(select_channels_label)
+        control_box_3.addLayout(check_group)
 
-        horizontal_layout.addWidget(control_centre_widget)
+        clear_selection_button = QPushButton("Clear Selection")
+        control_box_3.addWidget(clear_selection_button)
+
+        control_centre.addWidget(control_box_1_widget)
+        control_centre.addWidget(control_box_2_widget)
+        control_centre.addWidget(control_box_3_widget)
+
         self.plot_widget = VisPyPlotWidget()
-        horizontal_layout.addWidget(self.plot_widget)
+        vertical_layout.addWidget(self.plot_widget)
 
-        main_vertical_layout.addLayout(horizontal_layout)
+        bottom_bar = QHBoxLayout()
+        self.control_button = QPushButton("Start Plotting")
+        self.control_button.clicked.connect(self.toggle_plotting)
+        credits_butt = QPushButton("Credits")
+        export_butt = QPushButton("Export")
+
+        bottom_bar.addWidget(self.control_button)
+        bottom_bar.addWidget(credits_butt)
+        bottom_bar.addWidget(export_butt)
+
+        vertical_layout.addLayout(bottom_bar)
+
+        main_horizontal_layout.addWidget(control_centre_widget)
+        main_horizontal_layout.addLayout(vertical_layout)
+
 
         self.view_model.data_updated.connect(self.plot_widget.update_data)
 
