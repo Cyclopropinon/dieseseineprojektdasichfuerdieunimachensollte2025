@@ -61,7 +61,12 @@ class MainView(QMainWindow):
         on_off_butt = QPushButton("MAIN SWITCH")
         on_off_butt.setFixedSize(100, 100);
         on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
-        status_ip_txt = QLabel("Status: CONNECTED \n IP: 62.214.70.46:8080"  )
+        #status_ip_txt = QLabel("Status: CONNECTED \n IP: 127.0.0.1:8080")
+        status_ip_txt = FuniWidget()
+        status_ip_txt.enable("funiStuff/nyancat.gif")
+        status_ip_txt.play()
+        status_ip_txt.show()
+
 
         main_button.addWidget(on_off_butt)
         main_button.addWidget(status_ip_txt)
