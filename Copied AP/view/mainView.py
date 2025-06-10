@@ -62,6 +62,7 @@ class MainView(QMainWindow):
 
 
         '''
+        
         gif_path = "view/nyancat.gif"
         self.movie = QMovie(gif_path)
         gif = QLabel()
@@ -70,6 +71,7 @@ class MainView(QMainWindow):
         
         '''
 
+ 
         cat_waking_up = "view/cat_waking_up.gif"
         self.movie = QMovie(cat_waking_up)
         gif = QLabel()
