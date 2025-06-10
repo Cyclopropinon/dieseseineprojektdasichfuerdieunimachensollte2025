@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLab
 from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
 from .funigifs import FuniWidget
+from .credits import CreditsDialog
 
 
 class MainView(QMainWindow):
@@ -50,12 +51,9 @@ class MainView(QMainWindow):
         top_bar_widget.setLayout(top_bar)
         top_bar_widget.setFixedHeight(150)
 
-
-
-
-        gif_button = QVBoxLayout()
-        gif_button_widget = QWidget()
-        gif_button_widget.setLayout(gif_button)
+        gif_box = QVBoxLayout()
+        gif_box_widget = QWidget()
+        gif_box_widget.setLayout(gif_box)
 
         on_off_butt = QPushButton("MAIN SWITCH")
         on_off_butt.setFixedSize(100, 100);
@@ -63,13 +61,13 @@ class MainView(QMainWindow):
         status_ip_txt = QLabel("Status: CONNECTED \n IP: 62.214.70.46:8080"  )
 
         gif = QWidget()
-        gif_button.addWidget(gif)
-        gif_button.addWidget(status_ip_txt)
+        gif_box.addWidget(gif)
+        gif_box.addWidget(status_ip_txt)
 
         spacer = QSpacerItem(500, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
         top_bar.addSpacerItem(spacer)
         top_bar.addWidget(on_off_butt)
-        top_bar.addWidget(gif_button_widget)
+        top_bar.addWidget(gif_box_widget)
 
         vertical_layout = QVBoxLayout()
 
@@ -150,11 +148,13 @@ class MainView(QMainWindow):
         bottom_bar = QHBoxLayout()
         self.control_button = QPushButton("Start Plotting")
         self.control_button.clicked.connect(self.toggle_plotting)
-        credits_butt = QPushButton("Credits")
+        self.credits_butt = QPushButton("Credits")
+        self.credits_butt.clicked.connect(self.show_credits_dialog)
         export_butt = QPushButton("Export")
 
         bottom_bar.addWidget(self.control_button)
-        bottom_bar.addWidget(credits_butt)
+        bottom_bar.addWidget(self.credits_butt)
+
         bottom_bar.addWidget(export_butt)
 
         vertical_layout.addLayout(bottom_bar)
@@ -176,7 +176,12 @@ class MainView(QMainWindow):
             self.control_button.setText("Stop Plotting")
             self.view_model.start_plotting()
 
-
-
-
+    def show_credits_dialog(self):
+        """
+        Slot method to create and show the CreditsDialog when the button is clicked.
+        """
+        # Create an instance of the CreditsDialog, passing self as the parent
+        credits_dialog = CreditsDialog(self)
+        # Show the dialog modally (blocks interaction with parent window until closed)
+        credits_dialog.exec_()
 
