@@ -41,7 +41,7 @@ class MainView(QMainWindow):
         self.setCentralWidget(central_widget)
 
         ## sets a kuhl border so we can see the dingsdas
-        central_widget.setStyleSheet("border: 1px solid red;")
+        ##central_widget.setStyleSheet("border: 1px solid red;")
 
         main_horizontal_layout = QHBoxLayout()
         central_widget.setLayout(main_horizontal_layout)
@@ -60,13 +60,21 @@ class MainView(QMainWindow):
         on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
         status_ip_txt = QLabel("Status: CONNECTED \n IP: 62.214.70.46:8080"  )
 
+
+        '''
         gif_path = "view/nyancat.gif"
         self.movie = QMovie(gif_path)
         gif = QLabel()
         gif.setMovie(self.movie)
         self.movie.start()
+        
+        '''
 
-
+        cat_waking_up = "view/cat_waking_up.gif"
+        self.movie = QMovie(cat_waking_up)
+        gif = QLabel()
+        gif.setMovie(self.movie)
+        self.movie.start()
 
 
         gif_box.addWidget(gif)
