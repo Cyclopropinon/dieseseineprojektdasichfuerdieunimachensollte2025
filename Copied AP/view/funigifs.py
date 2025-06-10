@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
 from PyQt5.QtGui import QMovie
 from PyQt5.QtCore import Qt
 
-class FuniWidget(QWidget):
+class FuniWidget(QMovie):
 	"""
 	Widget to display funi stuff on da sceen :D
 	"""
