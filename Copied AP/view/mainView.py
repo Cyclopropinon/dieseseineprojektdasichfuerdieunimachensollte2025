@@ -129,9 +129,10 @@ class MainView(QMainWindow):
         check_columns_2_widget.setFixedWidth(60)
 
         check_list = []
-        for i in range(1, 33, 1):
-            check_list.append(QCheckBox(str(i)))
-
+        for i in range(1, 33):
+            checkbox = QCheckBox(str(i))
+            checkbox.stateChanged.connect(lambda state, x=i: self.plot_widget.update_channel(None, [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], x))
+            check_list.append(checkbox)
         for x in range(int(len(check_list) / 2)):
             check_columns_1.addWidget(check_list[x])
 

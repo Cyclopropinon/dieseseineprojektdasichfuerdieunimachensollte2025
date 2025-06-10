@@ -63,3 +63,6 @@ class VisPyPlotWidget(QWidget):
         # Keep the view fixed
         self.view.camera.set_range(x=(0, 10), y=(-10, 10))
         self.canvas.update() 
+
+    def update_channel(self, time_points, data, channel):
+        self.update_data(time_points, data[channel])
