@@ -1,102 +1,179 @@
 from PyQt5.QtCore import QObject, pyqtSignal, QTimer
 import numpy as np
-from services.signal_processor import SignalProcessor
+import collections # Import collections for deque
+
+# Import your existing EMGTCPClient class.
+# Ensure 'services/tcp_client.py' is correctly in your project path.
+from services.tcp_client import EMGTCPClient
 
 class MainViewModel(QObject):
     """
-    ViewModel class that connects the signal data with the visualization.
-    
+    ViewModel class that connects the signal data with the visualization for live streaming.
+
     This class is part of the ViewModel layer in the MVVM architecture. It:
-    - Manages the signal data and its updates
-    - Controls the plotting state (start/stop)
-    - Handles the timing of updates
-    - Emits signals to update the view
-    
+    - Manages incoming live signal data by buffering it in a fixed-size window.
+    - Controls the plotting state (start/stop) to animate the scrolling data.
+    - Handles the timing of updates, requesting new data chunks from the TCP client.
+    - Emits signals to update the view with the current fixed-size data window.
+
     Signals:
-        data_updated: Emitted when new data is available for plotting
+        data_updated: Emitted when new data (time_points, data_values) is available for plotting.
+                      The 'time_points' array will always represent a fixed time window (e.g., 0 to 10 seconds),
+                      and 'data_values' will contain the corresponding live signal data, ensuring a continuous
+                      scrolling display.
     """
-    
-    # Signals for the view to connect to
-    data_updated = pyqtSignal(np.ndarray, np.ndarray)  # time, data
-    
+
+    # Signals for the view to connect to.
+    # The signal carries two numpy arrays: the time points for the current window
+    # and the corresponding data values for that window.
+    data_updated = pyqtSignal(np.ndarray, np.ndarray)
+
     def __init__(self):
         """
-        Initialize the ViewModel with signal processor and timer.
-        
-        Sets up:
-        - Signal processor with 10s window and 2048 Hz sampling
-        - Timer for 30 Hz updates
-        - Initial data generation
-        - Fixed time window for display
+        Initialize the ViewModel with the signal processor and QTimer.
+
+        This constructor sets up:
+        - The signal processor (EMGTCPClient) for live data acquisition.
+        - Calculates the effective sampling rate based on the client's packet size and ViewModel's update rate.
+        - A QTimer for periodic updates, configured for smooth animation (e.g., 30 Hz).
+        - The definition of the fixed time window (X-axis range) for the plot.
+        - A deque-based buffer to efficiently manage the live incoming data for the display window.
         """
-        super().__init__()
-        self.signal_processor = SignalProcessor(window_size=10, sampling_rate=2048)
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_data)
-        
-        # Initialize data
-        self.time_points, self.raw_data = self.signal_processor.generate_test_signal(duration=60)
-        self.current_index = 0
+        super().__init__() # Call the base class constructor
+
+        # Initialize the signal processor (EMGTCPClient).
+        # This will use the EMGTCPClient class as provided by you, without modifications.
+        self.signal_processor = EMGTCPClient()
+
+        # Define the update interval for the plot (e.g., 30 Hz).
+        # An update rate of 30 Hz means an interval of approximately 33 milliseconds (1000ms / 30Hz).
+        self.update_interval_ms = 33
+
+        # Calculate the effective sampling rate based on the EMGTCPClient's packet size
+        # and how frequently the ViewModel requests data.
+        # If the ViewModel requests data every `update_interval_ms`, and each packet
+        # contains `SAMPLES_PER_PACKET` samples per channel, then the effective
+        # sampling rate for the *displayed stream* is:
+        # samples_per_packet * (1000ms / update_interval_ms)
+        # E.g., 18 samples/packet * (1000ms / 33ms) ~= 18 * 30.3 = 545.4 Hz
+        # We'll use 30 as a cleaner approximation if 33ms is the exact interval.
+        self.effective_sampling_rate = self.signal_processor.SAMPLES_PER_PACKET * \
+                                       int(1000 / self.update_interval_ms)
+
+
+        # Define the fixed time window for display on the plot (e.g., 10 seconds).
+        # This will be the constant duration of the X-axis for the plot.
+        self.display_window_seconds = 10
+
+        # Calculate the exact number of samples that fit into the defined display window
+        # based on the effective sampling rate.
+        self.samples_per_display_window = int(self.display_window_seconds * self.effective_sampling_rate)
+
+        # Create the fixed time array for the X-axis of the plot (e.g., 0 to 10 seconds).
+        # Using endpoint=False ensures consistency where the last sample is at (N-1)/Fs.
+        self.fixed_time_window = np.linspace(
+            0, self.display_window_seconds, self.samples_per_display_window, endpoint=False
+        )
+
+        # Use a collections.deque for efficient fixed-size buffering of live data.
+        # 'maxlen' ensures the buffer automatically discards older data when new data is added,
+        # maintaining a constant size equal to the display window.
+        self.data_buffer = collections.deque(maxlen=self.samples_per_display_window)
+        # Initialize the buffer with zeros to fill the initial plot display.
+        # This prevents an empty plot before the first live data arrives.
+        self.data_buffer.extend(np.zeros(self.samples_per_display_window, dtype=np.float32))
+
+        # Flag to control the plotting state (whether the timer is running or stopped).
         self.is_plotting = False
-        
-        # Create fixed time window (0 to 10 seconds)
-        self.fixed_time_window = np.linspace(0, 10, self.signal_processor.points_per_window)
-        
-        # Set update interval to 30 Hz
-        self.timer.setInterval(33)  # 1000ms/30Hz ≈ 33ms
-        
+
+        # Set up the QTimer for periodic updates to the plot.
+        self.timer = QTimer(self) # Pass self as parent for proper QObject hierarchy management
+        self.timer.setInterval(self.update_interval_ms)
+        self.timer.timeout.connect(self.update_data) # Connect timeout signal to the update_data method
+
+        # Attempt to connect to the TCP server immediately when the ViewModel is initialized.
+        # This ensures the client is ready to receive data as soon as plotting starts.
+        self.signal_processor.connect()
+
     def start_plotting(self):
         """
-        Start the live plotting.
-        
+        Starts the live plotting simulation.
+
         This method:
-        - Sets the plotting state to active
-        - Starts the update timer
+        - Sets the internal plotting state to active.
+        - Starts the QTimer, which will periodically call `update_data()`.
+        - Calls `update_data()` immediately once to populate the plot without delay,
+          ensuring the view is updated as soon as plotting begins.
         """
         if not self.is_plotting:
             self.is_plotting = True
             self.timer.start()
-            
+            # Emit data immediately upon starting to ensure the plot is populated
+            # without waiting for the first timer timeout.
+            self.update_data()
+
     def stop_plotting(self):
         """
-        Stop the live plotting.
-        
+        Stops the live plotting simulation.
+
         This method:
-        - Sets the plotting state to inactive
-        - Stops the update timer
+        - Sets the internal plotting state to inactive.
+        - Stops the QTimer, halting further data emissions and plot updates.
+        - Closes the TCP connection cleanly by calling the signal processor's close method.
         """
         if self.is_plotting:
             self.is_plotting = False
             self.timer.stop()
-            
+            ##self.signal_processor.close() # Close TCP connection cleanly
+
     def update_data(self):
         """
-        Update the data window and emit new data.
-        
-        This method is called by the timer at 30 Hz. It:
-        - Gets the current window of data
-        - Pads with zeros if needed
-        - Emits the new data for plotting
-        - Updates the current index
-        - Resets if we reach the end
+        Updates the data window for the plot by fetching new live data and emitting it.
+
+        This method is called by the QTimer at the specified update frequency. It:
+        - Fetches a new data packet (containing data for all channels) from the EMGTCPClient.
+        - Extracts data from the first channel (index 0) of the received packet.
+        - Appends this new chunk of single-channel data to the right of the internal data buffer (deque).
+        - The deque's 'maxlen' property automatically ensures the buffer maintains
+          the fixed `samples_per_display_window` size by removing older elements.
+        - Converts the deque content to a NumPy array for compatibility with the signal.
+        - Emits the `fixed_time_window` and the current content of the data buffer
+          via the `data_updated` signal, allowing the view to refresh its plot.
+        - If no data is received (e.g., due to connection issues or timeouts),
+          it prints a message.
         """
-        window_size = self.signal_processor.points_per_window
-        end_idx = min(self.current_index + window_size, len(self.time_points))
-        
-        # Get the current window of data
-        data_window = self.raw_data[self.current_index:end_idx]
-        
-        # If we don't have enough data to fill the window, pad with zeros
-        if len(data_window) < window_size:
-            data_window = np.pad(data_window, (0, window_size - len(data_window)))
-        
-        # Emit the fixed time window and the shifted data
-        self.data_updated.emit(self.fixed_time_window, data_window)
-        
-        # Update the current index (move by 1/30th of a second worth of samples)
-        self.current_index += self.signal_processor.sampling_rate // 30
-        
-        # Reset if we reach the end
-        if self.current_index >= len(self.time_points) - window_size:
-            self.current_index = 0
-            
+        # Fetch new data packet from the client.
+        # This will return a (CHANNELS, SAMPLES_PER_PACKET) NumPy array or None.
+        new_packet_all_channels = self.signal_processor.receive_data()
+
+        if new_packet_all_channels is not None:
+            # Extract data from the first channel (index 0) for plotting.
+            # If you need to plot a different channel, change the index here.
+            new_data_chunk = new_packet_all_channels[7, :]
+
+            # Extend the data buffer with the new chunk.
+            # Due to `maxlen`, older data will be automatically discarded from the left.
+            self.data_buffer.extend(new_data_chunk)
+
+            # In rare cases (e.g., very slow initial data, or if receive_data
+            # returns an unexpectedly short chunk due to network issues), the buffer
+            # might be less than `maxlen`. This loop pads with zeros to ensure the
+            # buffer always matches `samples_per_display_window` for consistent plotting.
+            while len(self.data_buffer) < self.samples_per_display_window:
+                self.data_buffer.append(0.0) # Pad with zeros (ensure float type for consistency)
+
+            # Convert the deque to a numpy array for emission.
+            # Specify dtype for consistency, especially if padding with integers.
+            current_data_for_plot = np.array(self.data_buffer, dtype=np.float32)
+
+            # Emit the `fixed_time_window` (constant X-axis) and the `current_data_for_plot`
+            # (the continuously updated signal data) to the connected view.
+            self.data_updated.emit(self.fixed_time_window, current_data_for_plot)
+        else:
+            # If `receive_data()` returns None, it indicates a problem (e.g., disconnected, timeout).
+            # Print a message to the console. You might want to add more robust error handling
+            # or UI feedback here (e.g., displaying a "disconnected" status to the user).
+            print("No data received from TCP client. Check connection status or server.")
+            # Optionally, you can uncomment the line below to stop plotting automatically
+            # if no data is received, assuming a continuous stream is essential for the app.
+            # self.stop_plotting()

@@ -2,7 +2,12 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLab
     QSpacerItem, QSizePolicy, QCheckBox
 from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
-from .funigifs import FuniWidget
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from .credits import CreditsDialog
+from PyQt5.QtGui import QMovie
+from .audio import AudioController
+import sys
+import os
 
 
 class MainView(QMainWindow):
@@ -40,7 +45,7 @@ class MainView(QMainWindow):
         self.setCentralWidget(central_widget)
 
         ## sets a kuhl border so we can see the dingsdas
-        central_widget.setStyleSheet("border: 1px solid red;")
+        ##central_widget.setStyleSheet("border: 1px solid red;")
 
         main_horizontal_layout = QHBoxLayout()
         central_widget.setLayout(main_horizontal_layout)
@@ -50,26 +55,55 @@ class MainView(QMainWindow):
         top_bar_widget.setLayout(top_bar)
         top_bar_widget.setFixedHeight(150)
 
-
-
-
-        gif_button = QVBoxLayout()
-        gif_button_widget = QWidget()
-        gif_button_widget.setLayout(gif_button)
+        self.gif_box = QVBoxLayout()
+        gif_box_widget = QWidget()
+        gif_box_widget.setLayout(self.gif_box)
 
         on_off_butt = QPushButton("MAIN SWITCH")
         on_off_butt.setFixedSize(100, 100);
         on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
         status_ip_txt = QLabel("Status: CONNECTED \n IP: 62.214.70.46:8080"  )
 
-        gif = QWidget()
-        gif_button.addWidget(gif)
-        gif_button.addWidget(status_ip_txt)
+
+        '''
+        
+        gif_path = "view/nyancat.gif"
+        self.movie = QMovie(gif_path)
+        gif = QLabel()
+        gif.setMovie(self.movie)
+        self.movie.start()
+        
+        '''
+
+ 
+        cat_waking_up = "view/cat_waking_up.gif"
+        self.movie = QMovie(cat_waking_up)
+        gif = QLabel()
+        gif.setMovie(self.movie)
+        self.movie.start()
+
+
+        self.gif_box.addWidget(gif)
+        self.gif_box.addWidget(status_ip_txt)
+
+
+        ##
+        self.audio_file_path = os.path.join(os.getcwd(), "view/Nyan Cat.mp3")
+        self.audio_controller = AudioController(self.audio_file_path, parent=self)
+        self.init_window_ui()
+
+        self.audio_controller.audio_state_changed.connect(self.update_audio_button_ui)
+        self.audio_controller.volume_changed.connect(lambda vol: self.update_audio_button_ui(self.audio_controller.get_current_state()))
+
+        self.update_audio_button_ui(self.audio_controller.get_current_state())
+        self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
+        ##
+
 
         spacer = QSpacerItem(500, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
         top_bar.addSpacerItem(spacer)
         top_bar.addWidget(on_off_butt)
-        top_bar.addWidget(gif_button_widget)
+        top_bar.addWidget(gif_box_widget)
 
         vertical_layout = QVBoxLayout()
 
@@ -150,11 +184,13 @@ class MainView(QMainWindow):
         bottom_bar = QHBoxLayout()
         self.control_button = QPushButton("Start Plotting")
         self.control_button.clicked.connect(self.toggle_plotting)
-        credits_butt = QPushButton("Credits")
+        self.credits_butt = QPushButton("Credits")
+        self.credits_butt.clicked.connect(self.show_credits_dialog)
         export_butt = QPushButton("Export")
 
         bottom_bar.addWidget(self.control_button)
-        bottom_bar.addWidget(credits_butt)
+        bottom_bar.addWidget(self.credits_butt)
+
         bottom_bar.addWidget(export_butt)
 
         vertical_layout.addLayout(bottom_bar)
@@ -176,7 +212,40 @@ class MainView(QMainWindow):
             self.control_button.setText("Stop Plotting")
             self.view_model.start_plotting()
 
+    def show_credits_dialog(self):
+        """
+        Slot method to create and show the CreditsDialog when the button is clicked.
+        """
+        # Create an instance of the CreditsDialog, passing self as the parent
+        credits_dialog = CreditsDialog(self)
+        # Show the dialog modally (blocks interaction with parent window until closed)
+        credits_dialog.exec_()
 
+    def init_window_ui(self):
+        """
+        Initializes the main window's UI.
+        Assumes you already have a button (self.my_audio_button) in your layout.
+        """
 
+        # Your existing QPushButton instance
+        self.my_audio_button = QPushButton("Play")
+        self.gif_box.addWidget(self.my_audio_button)
 
+        # Connect your existing button's clicked signal to the AudioController's toggle method
+        self.my_audio_button.clicked.connect(self.audio_controller.toggle_playback)
 
+    def update_audio_button_ui(self, state: QMediaPlayer.State):
+        """
+        Updates the UI of the audio button based on the AudioController's state.
+        This method is a slot connected to the AudioController's audio_state_changed signal.
+        """
+        if state == QMediaPlayer.PlayingState:
+            if self.audio_controller.get_volume() != 0:
+                self.my_audio_button.setText("Mute")
+            else:
+                self.my_audio_button.setText("Unmute")
+                self.my_audio_button.setEnabled(True)
+        else:  # StoppedState, PausedState, BufferingState, etc.
+            self.my_audio_button.setText("Play")
+            # Only enable if media content was successfully loaded by the controller
+            self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
