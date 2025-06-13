@@ -5,7 +5,7 @@ import time
 
 
 class EMGTCPServer:
-    def __init__(self, host='localhost', port=12345, pkl_file=r'/Users/anshulpandey/Desktop/hello/Applied-Programming-2025/exercises/02/recording.pkl'):
+    def __init__(self, host='localhost', port=12345, pkl_file='recording.pkl'):
         self.host = host
         self.port = port
         self.pkl_file = pkl_file
