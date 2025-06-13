@@ -1,3 +1,5 @@
+#!uv
+
 import sys
 from PyQt5.QtWidgets import QApplication
 from view.mainView import MainView  
