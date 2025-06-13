@@ -64,8 +64,7 @@ class EMGTCPClient:
             self.connected = False
             print("Connection closed")
 
-
-def main():
+'''def main():
     # Create and connect the client
     client = EMGTCPClient()
     client.connect()
@@ -87,4 +86,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main()'''
