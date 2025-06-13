@@ -1,3 +1,4 @@
+import argparse
 import numpy as np
 import pickle
 import shutil
@@ -34,6 +35,10 @@ class EMGTCPServer:
             raise
 
     def print_data(self, data, window_index):
+        # skip, if printing disabled
+        if args.no-data-print:
+            return
+
         # set terminalbreite, um vorzeitiges umbrechen zu verhindern
         terminal_width = shutil.get_terminal_size((100, 20)).columns  # fallback: 100 Zeichen
         np.set_printoptions(linewidth=terminal_width)
@@ -127,6 +132,11 @@ class EMGTCPServer:
         print("Server stopped")
 
 if __name__ == "__main__":
+    # disable debug output if has "--no-data-print"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--no-data-print', action='store_true', help='Does not print the sent data')
+    args = parser.parse_args()
+
     # Create and start the server
     server = EMGTCPServer()
     try:
