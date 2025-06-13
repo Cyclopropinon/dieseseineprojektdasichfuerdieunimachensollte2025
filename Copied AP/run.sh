@@ -1,6 +1,6 @@
 #!/bin/bash
 
-uv run services/tcp_server.py --no-data-print&
+uv run services/tcp_server.py --ndp&
 sts_pid=$!
 
 uv run main.py

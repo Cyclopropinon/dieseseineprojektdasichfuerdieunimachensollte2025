@@ -36,7 +36,7 @@ class EMGTCPServer:
 
     def print_data(self, data, window_index):
         # skip, if printing disabled
-        if args.no-data-print:
+        if args.ndp:
             return
 
         # set terminalbreite, um vorzeitiges umbrechen zu verhindern
@@ -132,9 +132,9 @@ class EMGTCPServer:
         print("Server stopped")
 
 if __name__ == "__main__":
-    # disable debug output if has "--no-data-print"
+    # disable debug output if has "--ndp" (short for no data print)
     parser = argparse.ArgumentParser()
-    parser.add_argument('--no-data-print', action='store_true', help='Does not print the sent data')
+    parser.add_argument('--ndp', action='store_true', help='Does not print the sent data')
     args = parser.parse_args()
 
     # Create and start the server
