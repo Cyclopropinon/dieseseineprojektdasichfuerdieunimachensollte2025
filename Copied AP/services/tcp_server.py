@@ -1,4 +1,7 @@
+import argparse
+import numpy as np
 import pickle
+import shutil
 import socket
 import threading
 import time
@@ -32,13 +35,25 @@ class EMGTCPServer:
             raise
 
     def print_data(self, data, window_index):
+        # skip, if printing disabled
+        if args.ndp:
+            return
+
+        # set terminalbreite, um vorzeitiges umbrechen zu verhindern
+        terminal_width = shutil.get_terminal_size((100, 20)).columns  # fallback: 100 Zeichen
+        np.set_printoptions(linewidth=terminal_width)
+
         """Print the current chunk of data"""
-        print(f"\nSending window {window_index}:")
-        print(f"Shape: {data.shape}")
-        print("Data values:")
+        print(f"\x1b[HSending window {window_index}:" + (" " * 30))
+        print(f"Shape: {data.shape}" + (" " * 30))
+        print("Data values:" + (" " * 30))
         for i in range(data.shape[0]):
-            print(f"Channel {i+1}: {data[i, :]}")
-        print("-" * 50)
+            line = f"Channel {i+1}: {data[i, :]}"
+            padded_line = line.ljust(terminal_width)  # mit Leerzeichen auffüllen
+            print(padded_line)
+        print(" ".ljust(terminal_width))
+        print(" ".ljust(terminal_width))
+        #print("-" * 50)
 
     def start(self):
         """Start the TCP server"""
@@ -117,6 +132,11 @@ class EMGTCPServer:
         print("Server stopped")
 
 if __name__ == "__main__":
+    # disable debug output if has "--ndp" (short for no data print)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--ndp', action='store_true', help='Does not print the sent data')
+    args = parser.parse_args()
+
     # Create and start the server
     server = EMGTCPServer()
     try:
