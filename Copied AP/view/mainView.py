@@ -91,12 +91,13 @@ class MainView(QMainWindow):
         control_box_1_widget.setLayout(control_box_1)
         butt_plot_indi_ch = QPushButton("Plot Individual Channels")
         butt_plot_indi_ch.clicked.connect(self.indi_ch)
-        butt_diff_ch = QPushButton("Differential Channels")
+        self.butt_diff_ch = QPushButton("Differential Channels")
+        self.butt_diff_ch.clicked.connect(self.diff_ch)
         butt_freq_domain_anal = QPushButton("Frequency Domain Analysis")
         butt_cross_ch_comp = QPushButton("Cross Channel Analysis")
 
         control_box_1.addWidget(butt_plot_indi_ch)
-        control_box_1.addWidget(butt_diff_ch)
+        control_box_1.addWidget(self.butt_diff_ch)
         control_box_1.addWidget(butt_freq_domain_anal)
         control_box_1.addWidget(butt_cross_ch_comp)
 
@@ -131,6 +132,7 @@ class MainView(QMainWindow):
         check_columns_2_widget.setFixedWidth(60)
 
         self.check_list = []
+        self.list_checked = []
         self.button_group = QButtonGroup(self)
         for i in range(1, 33, 1):
             check_box = QCheckBox(str(i))
@@ -149,6 +151,7 @@ class MainView(QMainWindow):
         control_box_3.addLayout(check_group)
 
         clear_selection_button = QPushButton("Clear Selection")
+        clear_selection_button.clicked.connect(self.clear_selec)
         control_box_3.addWidget(clear_selection_button)
 
         control_centre.addWidget(control_box_1_widget)
@@ -242,6 +245,8 @@ class MainView(QMainWindow):
         ##Linking channel buttons
         for k in range(0, 32, 1):
             self.check_list[k].clicked.connect(self.link_channel)
+        self.exclusive_state = False
+        self.button_group.setExclusive(False)
 
     def plotting_connected(self):
         ## GIF
@@ -275,12 +280,46 @@ class MainView(QMainWindow):
         self.current_file = audio_file
 
     def link_channel(self):
-        sender_button = self.sender()
-        button_name = int(sender_button.text())
+        self.sender_button = self.sender()
+        button_name = int(self.sender_button.text())
         self.view_model.change_channel(button_name-1)
+        self.list_checked.append(self.sender_button)
+
+        if self.butt_diff_ch.isChecked:
+            self.diff_ch()
 
     def indi_ch(self):
         self.button_group.setExclusive(True)
+        self.exclusive_state = True
+
+    def clear_selec(self):
+        """
+        Slot to uncheck all checkboxes in the exclusive button group.
+        Temporarily disables exclusivity to allow unchecking, then re-enables it.
+        """
+        # Temporarily set exclusive to False to allow unchecking multiple buttons
+        self.button_group.setExclusive(False)
+
+        # Iterate through all buttons in the group and uncheck them
+        for button in self.button_group.buttons():
+            if button.isChecked(): # Only attempt to uncheck if it's currently checked
+                button.setChecked(False)
+                self.list_checked.remove(button)
+
+        if self.butt_diff_ch.isChecked:
+            self.diff_ch()
+        # Re-enable exclusivity
+        self.button_group.setExclusive(self.exclusive_state)
+        print("All checkboxes cleared.")
+
+    def diff_ch(self):
+        self.button_group.setExclusive(False)
+        self.exclusive_state = False
+
+        if len(self.list_checked) > 2:
+            self.sender_button.setChecked(False)
+            self.list_checked.remove(self.sender_button)
+
 
 
 
