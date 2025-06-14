@@ -1,9 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSignal, QTimer
 import numpy as np
 import collections # Import collections for deque
-
-# Import your existing EMGTCPClient class.
-# Ensure 'services/tcp_client.py' is correctly in your project path.
 from services.tcp_client import EMGTCPClient
 
 class MainViewModel(QObject):
@@ -44,11 +41,9 @@ class MainViewModel(QObject):
         # Initialize the signal processor (EMGTCPClient).
         # This will use the EMGTCPClient class as provided by you, without modifications.
         self.signal_processor = EMGTCPClient()
-
         # Define the update interval for the plot (e.g., 30 Hz).
         # An update rate of 30 Hz means an interval of approximately 33 milliseconds (1000ms / 30Hz).
         self.update_interval_ms = 33
-
         # Calculate the effective sampling rate based on the EMGTCPClient's packet size
         # and how frequently the ViewModel requests data.
         # If the ViewModel requests data every `update_interval_ms`, and each packet
@@ -144,16 +139,16 @@ class MainViewModel(QObject):
         """
         # Fetch new data packet from the client.
         # This will return a (CHANNELS, SAMPLES_PER_PACKET) NumPy array or None.
-        new_packet_all_channels = self.signal_processor.receive_data()
+        self.new_packet_all_channels = self.signal_processor.receive_data()
 
-        if new_packet_all_channels is not None:
+        if self.new_packet_all_channels is not None:
             # Extract data from the first channel (index 0) for plotting.
             # If you need to plot a different channel, change the index here.
-            new_data_chunk = new_packet_all_channels[7, :]
+            self.new_data_chunk = self.new_packet_all_channels[self.ch]
 
             # Extend the data buffer with the new chunk.
             # Due to `maxlen`, older data will be automatically discarded from the left.
-            self.data_buffer.extend(new_data_chunk)
+            self.data_buffer.extend(self.new_data_chunk)
 
             # In rare cases (e.g., very slow initial data, or if receive_data
             # returns an unexpectedly short chunk due to network issues), the buffer
@@ -177,3 +172,7 @@ class MainViewModel(QObject):
             # Optionally, you can uncomment the line below to stop plotting automatically
             # if no data is received, assuming a continuous stream is essential for the app.
             # self.stop_plotting()
+
+    def change_channel(self, ch):
+        self.ch = ch
+

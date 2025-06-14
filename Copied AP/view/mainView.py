@@ -53,63 +53,32 @@ class MainView(QMainWindow):
         top_bar = QHBoxLayout()
         top_bar_widget = QWidget()
         top_bar_widget.setLayout(top_bar)
-        top_bar_widget.setFixedHeight(150)
-
-        self.gif_box = QVBoxLayout()
-        gif_box_widget = QWidget()
-        gif_box_widget.setLayout(self.gif_box)
+        top_bar_widget.setFixedHeight(180)
 
         self.on_off_butt = QPushButton("MAIN SWITCH")
         self.on_off_butt.setFixedSize(100, 100);
         self.on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
-        status_ip_txt = QLabel("Status: CONNECTED \n IP: 62.214.70.46:8080")
+        status_ip_txt = QLabel("Status: CONNECTED Host: localhost Port:12345")
+        status_ip_txt.setFixedHeight(30)
+        status_ip_txt.setAlignment(Qt.AlignCenter)
         self.on_off_butt.clicked.connect(self.start_animations)
 
-
-        '''
-        
-        gif_path = "view/nyancat.gif"
-        self.movie = QMovie(gif_path)
-        gif = QLabel()
-        gif.setMovie(self.movie)
-        self.movie.start()
-        
-        '''
-
-        '''
-        cat_waking_up = "view/cat_waking_up.gif"
-        self.movie = QMovie(cat_waking_up)
-        gif = QLabel()
-        gif.setMovie(self.movie)
-        self.movie.start()
-        '''
-
         self.gif = QLabel()
-        self.gif_box.addWidget(self.gif)
-        self.gif_box.addWidget(status_ip_txt)
+        self.gif.setStyleSheet("background-color: black")
+        self.gif.setFixedSize(350, 180)
 
-        '''
-        self.audio_file = ""
-        self.audio_file_path = os.path.join(os.getcwd(), self.audio_file)
-        self.audio_controller = AudioController(self.audio_file_path, parent=self)
-        self.init_window_ui()
-        self.audio_controller.set_looping(False)
-
-        self.audio_controller.audio_state_changed.connect(self.update_audio_button_ui)
-        self.audio_controller.volume_changed.connect(lambda vol: self.update_audio_button_ui(self.audio_controller.get_current_state()))
-
-        self.update_audio_button_ui(self.audio_controller.get_current_state())
-        self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
-        '''
         self.my_audio_button = QPushButton("Mute")
-        self.gif_box.addWidget(self.my_audio_button)
+        butt_box = QVBoxLayout()
+        butt_box.addWidget(self.on_off_butt)
+        butt_box.addWidget(self.my_audio_button)
 
-        spacer = QSpacerItem(500, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        spacer = QSpacerItem(400, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
         top_bar.addSpacerItem(spacer)
-        top_bar.addWidget(self.on_off_butt)
-        top_bar.addWidget(gif_box_widget)
+        top_bar.addLayout(butt_box)
+        top_bar.addWidget(self.gif)
 
         vertical_layout = QVBoxLayout()
+        vertical_layout.setSpacing(0)
 
         vertical_layout.addWidget(top_bar_widget)
 
@@ -160,15 +129,15 @@ class MainView(QMainWindow):
         check_columns_2_widget.setLayout(check_columns_2)
         check_columns_2_widget.setFixedWidth(60)
 
-        check_list = []
+        self.check_list = []
         for i in range(1, 33, 1):
-            check_list.append(QCheckBox(str(i)))
+            self.check_list.append(QCheckBox(str(i)))
 
-        for x in range(int(len(check_list) / 2)):
-            check_columns_1.addWidget(check_list[x])
+        for x in range(int(len(self.check_list) / 2)):
+            check_columns_1.addWidget(self.check_list[x])
 
-        for y in range(int(len(check_list) / 2), int(len(check_list))):
-            check_columns_2.addWidget(check_list[y])
+        for y in range(int(len(self.check_list) / 2), int(len(self.check_list))):
+            check_columns_2.addWidget(self.check_list[y])
 
         check_group.addWidget(check_columns_1_widget)
         check_group.addWidget(check_columns_2_widget)
@@ -183,6 +152,7 @@ class MainView(QMainWindow):
         control_centre.addWidget(control_box_3_widget)
 
         self.plot_widget = VisPyPlotWidget()
+        vertical_layout.addWidget(status_ip_txt)
         vertical_layout.addWidget(self.plot_widget)
 
         bottom_bar = QHBoxLayout()
@@ -196,9 +166,6 @@ class MainView(QMainWindow):
         bottom_bar.addWidget(self.credits_butt)
 
         bottom_bar.addWidget(export_butt)
-
-        '''if self.view_model.signal_processor.connected and self.view_model.is_plotting:
-            self.plotting_connected()'''
 
 
         vertical_layout.addLayout(bottom_bar)
@@ -268,6 +235,10 @@ class MainView(QMainWindow):
         self.view_model.data_updated.connect(self.plot_widget.update_data)
         self.on_off_butt.setEnabled(False)
 
+        ##Linking channel buttons
+        for k in range(0, 32, 1):
+            self.check_list[k].clicked.connect(self.link_channel)
+
     def plotting_connected(self):
         ## GIF
         gif_file = "view/nyancat.gif"
@@ -298,3 +269,13 @@ class MainView(QMainWindow):
         self.update_audio_button_ui(self.audio_controller.get_current_state())
         self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
         self.current_file = audio_file
+
+    def link_channel(self):
+        sender_button = self.sender()
+        button_name = int(sender_button.text())
+        self.view_model.change_channel(button_name-1)
+
+
+
+
+
