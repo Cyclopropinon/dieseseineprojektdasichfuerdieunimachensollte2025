@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QPushButton, \
-    QSpacerItem, QSizePolicy, QCheckBox
+    QSpacerItem, QSizePolicy, QCheckBox, QButtonGroup
 from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -90,6 +90,7 @@ class MainView(QMainWindow):
         control_box_1_widget = QWidget()
         control_box_1_widget.setLayout(control_box_1)
         butt_plot_indi_ch = QPushButton("Plot Individual Channels")
+        butt_plot_indi_ch.clicked.connect(self.indi_ch)
         butt_diff_ch = QPushButton("Differential Channels")
         butt_freq_domain_anal = QPushButton("Frequency Domain Analysis")
         butt_cross_ch_comp = QPushButton("Cross Channel Analysis")
@@ -130,8 +131,11 @@ class MainView(QMainWindow):
         check_columns_2_widget.setFixedWidth(60)
 
         self.check_list = []
+        self.button_group = QButtonGroup(self)
         for i in range(1, 33, 1):
-            self.check_list.append(QCheckBox(str(i)))
+            check_box = QCheckBox(str(i))
+            self.check_list.append(check_box)
+            self.button_group.addButton(check_box)
 
         for x in range(int(len(self.check_list) / 2)):
             check_columns_1.addWidget(self.check_list[x])
@@ -274,6 +278,10 @@ class MainView(QMainWindow):
         sender_button = self.sender()
         button_name = int(sender_button.text())
         self.view_model.change_channel(button_name-1)
+
+    def indi_ch(self):
+        self.button_group.setExclusive(True)
+
 
 
 
