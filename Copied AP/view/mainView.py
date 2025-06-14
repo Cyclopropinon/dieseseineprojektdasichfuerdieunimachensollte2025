@@ -89,12 +89,22 @@ class MainView(QMainWindow):
         control_box_1 = QVBoxLayout()
         control_box_1_widget = QWidget()
         control_box_1_widget.setLayout(control_box_1)
+        control_box_1_butt_group = QButtonGroup()
+        control_box_1_butt_group.setExclusive(True)
         butt_plot_indi_ch = QPushButton("Plot Individual Channels")
+        control_box_1_butt_group.addButton(butt_plot_indi_ch)
         butt_plot_indi_ch.clicked.connect(self.indi_ch)
         self.butt_diff_ch = QPushButton("Differential Channels")
+        control_box_1_butt_group.addButton(self.butt_diff_ch)
         self.butt_diff_ch.clicked.connect(self.diff_ch)
         butt_freq_domain_anal = QPushButton("Frequency Domain Analysis")
+        control_box_1_butt_group.addButton(butt_freq_domain_anal)
+        butt_freq_domain_anal.clicked.connect(self.freq_anal)
         butt_cross_ch_comp = QPushButton("Cross Channel Analysis")
+        control_box_1_butt_group.addButton(butt_cross_ch_comp)
+        butt_cross_ch_comp.clicked.connect(self.multi_ch)
+
+        self.diff_ch_state = False
 
         control_box_1.addWidget(butt_plot_indi_ch)
         control_box_1.addWidget(self.butt_diff_ch)
@@ -285,12 +295,14 @@ class MainView(QMainWindow):
         self.view_model.change_channel(button_name-1)
         self.list_checked.append(self.sender_button)
 
-        if self.butt_diff_ch.isChecked:
+        if self.diff_ch_state:
             self.diff_ch()
 
     def indi_ch(self):
         self.button_group.setExclusive(True)
         self.exclusive_state = True
+        self.diff_ch_state = False
+        self.clear_selec()
 
     def clear_selec(self):
         """
@@ -301,13 +313,13 @@ class MainView(QMainWindow):
         self.button_group.setExclusive(False)
 
         # Iterate through all buttons in the group and uncheck them
-        for button in self.button_group.buttons():
-            if button.isChecked(): # Only attempt to uncheck if it's currently checked
-                button.setChecked(False)
-                self.list_checked.remove(button)
+        for button in self.list_checked:
+            button.setChecked(False)
+        self.list_checked.clear()
 
-        if self.butt_diff_ch.isChecked:
-            self.diff_ch()
+        print(len(self.list_checked))
+
+
         # Re-enable exclusivity
         self.button_group.setExclusive(self.exclusive_state)
         print("All checkboxes cleared.")
@@ -316,10 +328,26 @@ class MainView(QMainWindow):
         self.button_group.setExclusive(False)
         self.exclusive_state = False
 
+        if not self.diff_ch_state:
+            self.clear_selec()
+
+        self.diff_ch_state = True
+
         if len(self.list_checked) > 2:
             self.sender_button.setChecked(False)
             self.list_checked.remove(self.sender_button)
 
+    def freq_anal(self):
+        self.button_group.setExclusive(True)
+        self.exclusive_state = True
+        self.diff_ch_state = False
+        self.clear_selec()
+
+    def multi_ch(self):
+        self.button_group.setExclusive(False)
+        self.exclusive_state = False
+        self.diff_ch_state = False
+        self.clear_selec()
 
 
 
