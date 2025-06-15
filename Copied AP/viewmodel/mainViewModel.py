@@ -90,7 +90,7 @@ class MainViewModel(QObject):
         # This ensures the client is ready to receive data as soon as plotting starts.
         self.signal_processor.connect()
 
-    def start_plotting(self):
+    def start_plotting(self, state):
         """
         Starts the live plotting simulation.
 
@@ -103,9 +103,12 @@ class MainViewModel(QObject):
         if not self.is_plotting:
             self.is_plotting = True
             self.timer.start()
+            if state:
+                self.diff_update_data()
+            else:
             # Emit data immediately upon starting to ensure the plot is populated
             # without waiting for the first timer timeout.
-            self.update_data()
+                self.update_data()
 
     def stop_plotting(self):
         """
@@ -176,3 +179,58 @@ class MainViewModel(QObject):
     def change_channel(self, ch):
         self.ch = ch
 
+    def receive_list(self, checked_list):
+        self.checked_list = checked_list
+
+    def diff_update_data(self):
+        """
+                Updates the data window for the plot by fetching new live data and emitting it.
+
+                This method is called by the QTimer at the specified update frequency. It:
+                - Fetches a new data packet (containing data for all channels) from the EMGTCPClient.
+                - Extracts data from the first channel (index 0) of the received packet.
+                - Appends this new chunk of single-channel data to the right of the internal data buffer (deque).
+                - The deque's 'maxlen' property automatically ensures the buffer maintains
+                  the fixed `samples_per_display_window` size by removing older elements.
+                - Converts the deque content to a NumPy array for compatibility with the signal.
+                - Emits the `fixed_time_window` and the current content of the data buffer
+                  via the `data_updated` signal, allowing the view to refresh its plot.
+                - If no data is received (e.g., due to connection issues or timeouts),
+                  it prints a message.
+                """
+        # Fetch new data packet from the client.
+        # This will return a (CHANNELS, SAMPLES_PER_PACKET) NumPy array or None.
+        self.new_packet_all_channels = self.signal_processor.receive_data()
+
+        if self.new_packet_all_channels is not None:
+            # Extract data from the first channel (index 0) for plotting.
+            # If you need to plot a different channel, change the index here.
+            if len(self.checked_list) == 2:
+                self.diff_data = self.new_packet_all_channels[int(self.checked_list[0].text())] - self.new_packet_all_channels[int(self.checked_list[1].text())]
+                print(self.checked_list[0].text(), self.checked_list[1].text())
+            # Extend the data buffer with the new chunk.
+            # Due to `maxlen`, older data will be automatically discarded from the left.
+            self.data_buffer.extend(self.diff_data)
+
+            # In rare cases (e.g., very slow initial data, or if receive_data
+            # returns an unexpectedly short chunk due to network issues), the buffer
+            # might be less than `maxlen`. This loop pads with zeros to ensure the
+            # buffer always matches `samples_per_display_window` for consistent plotting.
+            while len(self.data_buffer) < self.samples_per_display_window:
+                self.data_buffer.append(0.0)  # Pad with zeros (ensure float type for consistency)
+
+            # Convert the deque to a numpy array for emission.
+            # Specify dtype for consistency, especially if padding with integers.
+            current_data_for_plot = np.array(self.data_buffer, dtype=np.float32)
+
+            # Emit the `fixed_time_window` (constant X-axis) and the `current_data_for_plot`
+            # (the continuously updated signal data) to the connected view.
+            self.data_updated.emit(self.fixed_time_window, current_data_for_plot)
+        else:
+            # If `receive_data()` returns None, it indicates a problem (e.g., disconnected, timeout).
+            # Print a message to the console. You might want to add more robust error handling
+            # or UI feedback here (e.g., displaying a "disconnected" status to the user).
+            print("No data received from TCP client. Check connection status or server.")
+            # Optionally, you can uncomment the line below to stop plotting automatically
+            # if no data is received, assuming a continuous stream is essential for the app.
+            # self.stop_plotting()

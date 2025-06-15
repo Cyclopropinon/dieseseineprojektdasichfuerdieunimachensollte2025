@@ -197,6 +197,9 @@ class MainView(QMainWindow):
         """
         Toggle the plotting state and update button text.
         """
+        if self.diff_ch_state:
+            self.view_model.receive_list(self.list_checked)
+
         if self.view_model.is_plotting:
             self.control_button.setText("Start Plotting")
             self.view_model.stop_plotting()
@@ -205,7 +208,7 @@ class MainView(QMainWindow):
 
         else:
             self.control_button.setText("Stop Plotting")
-            self.view_model.start_plotting()
+            self.view_model.start_plotting(self.diff_ch_state)
             if self.view_model.signal_processor.connected:
                 self.plotting_connected()
 
@@ -254,7 +257,7 @@ class MainView(QMainWindow):
 
         ##Linking channel buttons
         for k in range(0, 32, 1):
-            self.check_list[k].clicked.connect(self.link_channel)
+            self.check_list[k].stateChanged.connect(self.link_channel)
         self.exclusive_state = False
         self.button_group.setExclusive(False)
 
@@ -289,14 +292,19 @@ class MainView(QMainWindow):
         self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
         self.current_file = audio_file
 
-    def link_channel(self):
+    def link_channel(self, state):
         self.sender_button = self.sender()
         button_name = int(self.sender_button.text())
         self.view_model.change_channel(button_name-1)
-        self.list_checked.append(self.sender_button)
 
         if self.diff_ch_state:
+            self.list_checked.append(self.sender_button)
             self.diff_ch()
+            if state == Qt.Unchecked and self.sender_button in self.list_checked:
+                self.list_checked.remove(self.sender_button)
+
+
+
 
     def indi_ch(self):
         self.button_group.setExclusive(True)
@@ -317,8 +325,6 @@ class MainView(QMainWindow):
             button.setChecked(False)
         self.list_checked.clear()
 
-        print(len(self.list_checked))
-
 
         # Re-enable exclusivity
         self.button_group.setExclusive(self.exclusive_state)
@@ -332,6 +338,8 @@ class MainView(QMainWindow):
             self.clear_selec()
 
         self.diff_ch_state = True
+        #self.view_model.data_updated.connect(self.plot_widget.update_data)
+
 
         if len(self.list_checked) > 2:
             self.sender_button.setChecked(False)
