@@ -257,7 +257,7 @@ class MainView(QMainWindow):
 
         ##Linking channel buttons
         for k in range(0, 32, 1):
-            self.check_list[k].stateChanged.connect(self.link_channel)
+            self.check_list[k].clicked.connect(self.link_channel)
         self.exclusive_state = False
         self.button_group.setExclusive(False)
 
@@ -296,9 +296,9 @@ class MainView(QMainWindow):
         self.sender_button = self.sender()
         button_name = int(self.sender_button.text())
         self.view_model.change_channel(button_name-1)
+        self.list_checked.append(self.sender_button)
 
         if self.diff_ch_state:
-            self.list_checked.append(self.sender_button)
             self.diff_ch()
             if state == Qt.Unchecked and self.sender_button in self.list_checked:
                 self.list_checked.remove(self.sender_button)
@@ -338,12 +338,11 @@ class MainView(QMainWindow):
             self.clear_selec()
 
         self.diff_ch_state = True
-        #self.view_model.data_updated.connect(self.plot_widget.update_data)
-
 
         if len(self.list_checked) > 2:
             self.sender_button.setChecked(False)
             self.list_checked.remove(self.sender_button)
+
 
     def freq_anal(self):
         self.button_group.setExclusive(True)
