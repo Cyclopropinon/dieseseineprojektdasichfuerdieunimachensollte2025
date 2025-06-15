@@ -190,6 +190,8 @@ class MainView(QMainWindow):
         main_horizontal_layout.addWidget(control_centre_widget)
         main_horizontal_layout.addLayout(vertical_layout)
 
+        self.current_mode = ""
+
 
 
 
@@ -208,7 +210,7 @@ class MainView(QMainWindow):
 
         else:
             self.control_button.setText("Stop Plotting")
-            self.view_model.start_plotting(self.diff_ch_state)
+            self.view_model.start_plotting(self.diff_ch_state, self.current_mode)
             if self.view_model.signal_processor.connected:
                 self.plotting_connected()
 
@@ -311,6 +313,7 @@ class MainView(QMainWindow):
         self.exclusive_state = True
         self.diff_ch_state = False
         self.clear_selec()
+        self.current_mode = "indi_ch"
 
     def clear_selec(self):
         """
@@ -333,6 +336,7 @@ class MainView(QMainWindow):
     def diff_ch(self):
         self.button_group.setExclusive(False)
         self.exclusive_state = False
+        self.current_mode = "diff_ch"
 
         if not self.diff_ch_state:
             self.clear_selec()
@@ -349,6 +353,9 @@ class MainView(QMainWindow):
         self.exclusive_state = True
         self.diff_ch_state = False
         self.clear_selec()
+        self.current_mode = "freq_ch"
+
+
 
     def multi_ch(self):
         self.button_group.setExclusive(False)
