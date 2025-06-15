@@ -50,6 +50,22 @@ class SignalProcessor:
             
         return rms
     
+    def plot_filtered():
+        ax.clear()
+        t = np.arange(channel_data.shape[1]) / sampling_rate
+        # Apply bandpass filter
+        nyquist = sampling_rate / 2
+        low = 20 / nyquist
+        high = 450 / nyquist
+        b, a = signal.butter(4, [low, high], btype='band')
+        filtered_data = signal.filtfilt(b, a, channel_data[20, :])
+        ax.plot(t, filtered_data)
+        ax.set_title("Filtered EMG Signal")
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel("Amplitude")
+        ax.grid(True)
+        canvas.draw()
+        
     def generate_test_signal(self, duration=60):
         """
         Generate a test signal for live plotting demonstration.
