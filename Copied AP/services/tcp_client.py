@@ -64,26 +64,3 @@ class EMGTCPClient:
             self.connected = False
             print("Connection closed")
 
-'''def main():
-    # Create and connect the client
-    client = EMGTCPClient()
-    client.connect()
-
-    try:
-        # Receive and process data
-        while client.connected:
-            data = client.receive_data()
-            if data is not None:
-                # Print the received data
-                client.print_data(data)
-
-            # No need for additional sleep as we're already receiving at 1 chunk per second
-
-    except KeyboardInterrupt:
-        print("\nStopping client...")
-    finally:
-        client.close()
-
-
-if __name__ == "__main__":
-    main()'''

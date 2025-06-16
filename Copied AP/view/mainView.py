@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QPushButton, \
-    QSpacerItem, QSizePolicy, QCheckBox
+    QSpacerItem, QSizePolicy, QCheckBox, QButtonGroup
 from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -53,63 +53,32 @@ class MainView(QMainWindow):
         top_bar = QHBoxLayout()
         top_bar_widget = QWidget()
         top_bar_widget.setLayout(top_bar)
-        top_bar_widget.setFixedHeight(150)
-
-        self.gif_box = QVBoxLayout()
-        gif_box_widget = QWidget()
-        gif_box_widget.setLayout(self.gif_box)
+        top_bar_widget.setFixedHeight(180)
 
         self.on_off_butt = QPushButton("MAIN SWITCH")
         self.on_off_butt.setFixedSize(100, 100);
         self.on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
-        status_ip_txt = QLabel("Status: CONNECTED \n IP: 62.214.70.46:8080")
+        status_ip_txt = QLabel("Status: CONNECTED Host: localhost Port:12345")
+        status_ip_txt.setFixedHeight(30)
+        status_ip_txt.setAlignment(Qt.AlignCenter)
         self.on_off_butt.clicked.connect(self.start_animations)
 
-
-        '''
-        
-        gif_path = "view/nyancat.gif"
-        self.movie = QMovie(gif_path)
-        gif = QLabel()
-        gif.setMovie(self.movie)
-        self.movie.start()
-        
-        '''
-
-        '''
-        cat_waking_up = "view/cat_waking_up.gif"
-        self.movie = QMovie(cat_waking_up)
-        gif = QLabel()
-        gif.setMovie(self.movie)
-        self.movie.start()
-        '''
-
         self.gif = QLabel()
-        self.gif_box.addWidget(self.gif)
-        self.gif_box.addWidget(status_ip_txt)
+        self.gif.setStyleSheet("background-color: black")
+        self.gif.setFixedSize(350, 180)
 
-        '''
-        self.audio_file = ""
-        self.audio_file_path = os.path.join(os.getcwd(), self.audio_file)
-        self.audio_controller = AudioController(self.audio_file_path, parent=self)
-        self.init_window_ui()
-        self.audio_controller.set_looping(False)
-
-        self.audio_controller.audio_state_changed.connect(self.update_audio_button_ui)
-        self.audio_controller.volume_changed.connect(lambda vol: self.update_audio_button_ui(self.audio_controller.get_current_state()))
-
-        self.update_audio_button_ui(self.audio_controller.get_current_state())
-        self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
-        '''
         self.my_audio_button = QPushButton("Mute")
-        self.gif_box.addWidget(self.my_audio_button)
+        butt_box = QVBoxLayout()
+        butt_box.addWidget(self.on_off_butt)
+        butt_box.addWidget(self.my_audio_button)
 
-        spacer = QSpacerItem(500, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        spacer = QSpacerItem(400, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
         top_bar.addSpacerItem(spacer)
-        top_bar.addWidget(self.on_off_butt)
-        top_bar.addWidget(gif_box_widget)
+        top_bar.addLayout(butt_box)
+        top_bar.addWidget(self.gif)
 
         vertical_layout = QVBoxLayout()
+        vertical_layout.setSpacing(0)
 
         vertical_layout.addWidget(top_bar_widget)
 
@@ -120,13 +89,25 @@ class MainView(QMainWindow):
         control_box_1 = QVBoxLayout()
         control_box_1_widget = QWidget()
         control_box_1_widget.setLayout(control_box_1)
+        control_box_1_butt_group = QButtonGroup()
+        control_box_1_butt_group.setExclusive(True)
         butt_plot_indi_ch = QPushButton("Plot Individual Channels")
-        butt_diff_ch = QPushButton("Differential Channels")
+        control_box_1_butt_group.addButton(butt_plot_indi_ch)
+        butt_plot_indi_ch.clicked.connect(self.indi_ch)
+        self.butt_diff_ch = QPushButton("Differential Channels")
+        control_box_1_butt_group.addButton(self.butt_diff_ch)
+        self.butt_diff_ch.clicked.connect(self.diff_ch)
         butt_freq_domain_anal = QPushButton("Frequency Domain Analysis")
+        control_box_1_butt_group.addButton(butt_freq_domain_anal)
+        butt_freq_domain_anal.clicked.connect(self.freq_anal)
         butt_cross_ch_comp = QPushButton("Cross Channel Analysis")
+        control_box_1_butt_group.addButton(butt_cross_ch_comp)
+        butt_cross_ch_comp.clicked.connect(self.multi_ch)
+
+        self.diff_ch_state = False
 
         control_box_1.addWidget(butt_plot_indi_ch)
-        control_box_1.addWidget(butt_diff_ch)
+        control_box_1.addWidget(self.butt_diff_ch)
         control_box_1.addWidget(butt_freq_domain_anal)
         control_box_1.addWidget(butt_cross_ch_comp)
 
@@ -160,15 +141,19 @@ class MainView(QMainWindow):
         check_columns_2_widget.setLayout(check_columns_2)
         check_columns_2_widget.setFixedWidth(60)
 
-        check_list = []
+        self.check_list = []
+        self.list_checked = []
+        self.button_group = QButtonGroup(self)
         for i in range(1, 33, 1):
-            check_list.append(QCheckBox(str(i)))
+            check_box = QCheckBox(str(i))
+            self.check_list.append(check_box)
+            self.button_group.addButton(check_box)
 
-        for x in range(int(len(check_list) / 2)):
-            check_columns_1.addWidget(check_list[x])
+        for x in range(int(len(self.check_list) / 2)):
+            check_columns_1.addWidget(self.check_list[x])
 
-        for y in range(int(len(check_list) / 2), int(len(check_list))):
-            check_columns_2.addWidget(check_list[y])
+        for y in range(int(len(self.check_list) / 2), int(len(self.check_list))):
+            check_columns_2.addWidget(self.check_list[y])
 
         check_group.addWidget(check_columns_1_widget)
         check_group.addWidget(check_columns_2_widget)
@@ -176,6 +161,7 @@ class MainView(QMainWindow):
         control_box_3.addLayout(check_group)
 
         clear_selection_button = QPushButton("Clear Selection")
+        clear_selection_button.clicked.connect(self.clear_selec)
         control_box_3.addWidget(clear_selection_button)
 
         control_centre.addWidget(control_box_1_widget)
@@ -183,6 +169,7 @@ class MainView(QMainWindow):
         control_centre.addWidget(control_box_3_widget)
 
         self.plot_widget = VisPyPlotWidget()
+        vertical_layout.addWidget(status_ip_txt)
         vertical_layout.addWidget(self.plot_widget)
 
         bottom_bar = QHBoxLayout()
@@ -197,14 +184,13 @@ class MainView(QMainWindow):
 
         bottom_bar.addWidget(export_butt)
 
-        '''if self.view_model.signal_processor.connected and self.view_model.is_plotting:
-            self.plotting_connected()'''
-
 
         vertical_layout.addLayout(bottom_bar)
 
         main_horizontal_layout.addWidget(control_centre_widget)
         main_horizontal_layout.addLayout(vertical_layout)
+
+        self.current_mode = ""
 
 
 
@@ -213,6 +199,9 @@ class MainView(QMainWindow):
         """
         Toggle the plotting state and update button text.
         """
+        if self.diff_ch_state:
+            self.view_model.receive_list(self.list_checked)
+
         if self.view_model.is_plotting:
             self.control_button.setText("Start Plotting")
             self.view_model.stop_plotting()
@@ -221,7 +210,7 @@ class MainView(QMainWindow):
 
         else:
             self.control_button.setText("Stop Plotting")
-            self.view_model.start_plotting()
+            self.view_model.start_plotting(self.diff_ch_state, self.current_mode)
             if self.view_model.signal_processor.connected:
                 self.plotting_connected()
 
@@ -268,6 +257,12 @@ class MainView(QMainWindow):
         self.view_model.data_updated.connect(self.plot_widget.update_data)
         self.on_off_butt.setEnabled(False)
 
+        ##Linking channel buttons
+        for k in range(0, 32, 1):
+            self.check_list[k].clicked.connect(self.link_channel)
+        self.exclusive_state = False
+        self.button_group.setExclusive(False)
+
     def plotting_connected(self):
         ## GIF
         gif_file = "view/nyancat.gif"
@@ -298,3 +293,78 @@ class MainView(QMainWindow):
         self.update_audio_button_ui(self.audio_controller.get_current_state())
         self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
         self.current_file = audio_file
+
+    def link_channel(self, state):
+        self.sender_button = self.sender()
+        button_name = int(self.sender_button.text())
+        self.view_model.change_channel(button_name-1)
+        self.list_checked.append(self.sender_button)
+
+        if self.diff_ch_state:
+            self.diff_ch()
+            if state == Qt.Unchecked and self.sender_button in self.list_checked:
+                self.list_checked.remove(self.sender_button)
+
+
+
+
+    def indi_ch(self):
+        self.button_group.setExclusive(True)
+        self.exclusive_state = True
+        self.diff_ch_state = False
+        self.clear_selec()
+        self.current_mode = "indi_ch"
+
+    def clear_selec(self):
+        """
+        Slot to uncheck all checkboxes in the exclusive button group.
+        Temporarily disables exclusivity to allow unchecking, then re-enables it.
+        """
+        # Temporarily set exclusive to False to allow unchecking multiple buttons
+        self.button_group.setExclusive(False)
+
+        # Iterate through all buttons in the group and uncheck them
+        for button in self.list_checked:
+            button.setChecked(False)
+        self.list_checked.clear()
+
+
+        # Re-enable exclusivity
+        self.button_group.setExclusive(self.exclusive_state)
+        print("All checkboxes cleared.")
+
+    def diff_ch(self):
+        self.button_group.setExclusive(False)
+        self.exclusive_state = False
+        self.current_mode = "diff_ch"
+
+        if not self.diff_ch_state:
+            self.clear_selec()
+
+        self.diff_ch_state = True
+
+        if len(self.list_checked) > 2:
+            self.sender_button.setChecked(False)
+            self.list_checked.remove(self.sender_button)
+
+
+    def freq_anal(self):
+        self.button_group.setExclusive(True)
+        self.exclusive_state = True
+        self.diff_ch_state = False
+        self.clear_selec()
+        self.current_mode = "freq_ch"
+
+
+
+    def multi_ch(self):
+        self.button_group.setExclusive(False)
+        self.exclusive_state = False
+        self.diff_ch_state = False
+        self.clear_selec()
+
+
+
+
+
+
