@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from vispy import app, scene
 import numpy as np
+from services.signal_processor import SignalProcessor
 
 class VisPyPlotWidget(QWidget):
     """
@@ -24,6 +25,12 @@ class VisPyPlotWidget(QWidget):
             parent: Parent widget (optional)
         """
         super().__init__(parent)
+
+        # signal processor
+        self.sp = SignalProcessor()
+
+        # optional Filters
+        self.filter = self.sp.antifilter
         
         # Create layout
         layout = QVBoxLayout()
@@ -57,7 +64,7 @@ class VisPyPlotWidget(QWidget):
             data (np.ndarray): Array of signal values
         """
         # Create the line data
-        line_data = np.column_stack((time_points, data))
+        line_data = np.column_stack((time_points, self.filter(data)))
         self.line.set_data(line_data)
         
         # Keep the view fixed
