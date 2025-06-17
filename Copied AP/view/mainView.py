@@ -184,10 +184,9 @@ class MainView(QMainWindow):
 
         self.plot_widget = VisPyPlotWidget()
         vertical_layout.addWidget(self.plot_widget)
-        button_raw.clicked.connect(self.plot_widget.set_filter(0))
-        button_filt.clicked.connect(self.plot_widget.set_filter("butter"))
-
-        button_rms.clicked.connect(self.plot_widget.set_filter("rms"))
+        button_raw.clicked.connect(lambda: self.plot_widget.set_filter(0))
+        button_filt.clicked.connect(lambda: self.plot_widget.set_filter("butter"))
+        button_rms.clicked.connect(lambda: self.plot_widget.set_filter("rms"))
 
         bottom_bar = QHBoxLayout()
         self.control_button = QPushButton("Start Plotting")
