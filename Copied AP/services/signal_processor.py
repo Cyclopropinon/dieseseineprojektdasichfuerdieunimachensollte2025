@@ -27,7 +27,10 @@ class SignalProcessor:
         self.sampling_rate = sampling_rate
         self.points_per_window = window_size * sampling_rate
         
-    def calculate_rms(self, data, window_size=None):
+    def antifilter(self, data):
+        return data
+        
+    def calculate_rms(self, data):
         """
         Calculate the Root Mean Square (RMS) of the signal.
         
@@ -38,8 +41,8 @@ class SignalProcessor:
         Returns:
             np.ndarray: RMS values
         """
-        if window_size is None:
-            window_size = self.points_per_window
+        #if window_size is None:
+        window_size = self.points_per_window
             
         # Calculate RMS using rolling window
         rms = np.zeros_like(data)
@@ -50,6 +53,16 @@ class SignalProcessor:
             
         return rms
     
+    def butter_filter(self, data):
+        t = np.arange(channel_data.shape[1]) / sampling_rate
+        # Apply bandpass filter
+        nyquist = sampling_rate / 2
+        low = 20 / nyquist
+        high = 450 / nyquist
+        b, a = signal.butter(4, [low, high], btype='band')
+        filtered_data = signal.filtfilt(b, a, channel_data[20, :])
+        return filtered_data
+        
     def generate_test_signal(self, duration=60):
         """
         Generate a test signal for live plotting demonstration.
