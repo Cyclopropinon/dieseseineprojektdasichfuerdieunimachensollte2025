@@ -49,6 +49,19 @@ class VisPyPlotWidget(QWidget):
         
         # Set up the view with fixed range
         self.view.camera.set_range(x=(0, 10), y=(-10, 10))
+
+    def set_filter(self, f):
+        # WHY TF DOES PHYTHON NOT HAVE SWITCH??????????????
+        if f == 0:
+            self.filter = self.sp.antifilter
+        elif f == "rms":
+            self.filter = self.sp.calculate_rms
+        elif f == "butter":
+            self.filter = self.sp.butter_filter
+        else:
+            self.filter = self.sp.antifilter
+
+        # self.filter = f
         
     def update_data(self, time_points, data):
         """
