@@ -62,5 +62,6 @@ class VisPyPlotWidget(QWidget):
         self.line.set_data(line_data)
 
         # Keep the view fixed
-        self.view.camera.set_range(x=(0, 10), y=(-1000, 1000))
+        self.view.camera.set_range(x=(0, 10), y=(-5000, 5000))
         self.canvas.update()
+

@@ -23,7 +23,7 @@ class MainViewModel(QObject):
     # Signals for the view to connect to.
     # The signal carries two numpy arrays: the time points for the current window
     # and the corresponding data values for that window.
-    data_updated = pyqtSignal(np.ndarray, np.ndarray)
+    multi_data_updated = pyqtSignal(np.ndarray, list)
 
     def __init__(self):
         """
@@ -89,6 +89,7 @@ class MainViewModel(QObject):
         # Attempt to connect to the TCP server immediately when the ViewModel is initialized.
         # This ensures the client is ready to receive data as soon as plotting starts.
         self.signal_processor.connect()
+        self.list_of_ch = []
 
     def start_plotting(self, state, current_mode):
         """
@@ -109,8 +110,8 @@ class MainViewModel(QObject):
                 self.diff_update_data()
             elif current_mode == "freq_ch":
                 self.freq_update_data()
-            '''elif current_mode == "multi_ch":
-                self.multi_update_data()'''
+            elif current_mode == "multi_ch":
+                self.multi_update_data()
 
 
 
@@ -151,7 +152,8 @@ class MainViewModel(QObject):
         if self.new_packet_all_channels is not None:
             # Extract data from the first channel (index 0) for plotting.
             # If you need to plot a different channel, change the index here.
-            self.new_data_chunk = self.new_packet_all_channels[self.ch]
+            self.new_data_chunk = self.new_packet_all_channels[self.ch, :]
+            self.list_of_ch.clear()
 
             # Extend the data buffer with the new chunk.
             # Due to `maxlen`, older data will be automatically discarded from the left.
@@ -167,10 +169,11 @@ class MainViewModel(QObject):
             # Convert the deque to a numpy array for emission.
             # Specify dtype for consistency, especially if padding with integers.
             current_data_for_plot = np.array(self.data_buffer, dtype=np.float32)
+            self.list_of_ch.append(current_data_for_plot)
 
             # Emit the `fixed_time_window` (constant X-axis) and the `current_data_for_plot`
             # (the continuously updated signal data) to the connected view.
-            self.data_updated.emit(self.fixed_time_window, current_data_for_plot)
+            self.multi_data_updated.emit(self.fixed_time_window, self.list_of_ch)
         else:
             # If `receive_data()` returns None, it indicates a problem (e.g., disconnected, timeout).
             # Print a message to the console. You might want to add more robust error handling
@@ -210,7 +213,8 @@ class MainViewModel(QObject):
             # Extract data from the first channel (index 0) for plotting.
             # If you need to plot a different channel, change the index here.
             if len(self.checked_list) == 2:
-                self.diff_data = self.new_packet_all_channels[int(self.checked_list[0].text())] - self.new_packet_all_channels[int(self.checked_list[1].text())]
+                self.diff_data = self.new_packet_all_channels[int(self.checked_list[0].text()), :] - self.new_packet_all_channels[int(self.checked_list[1].text()), :]
+                self.list_of_ch.clear()
                 print(self.checked_list[0].text(), self.checked_list[1].text())
             # Extend the data buffer with the new chunk.
             # Due to `maxlen`, older data will be automatically discarded from the left.
@@ -226,10 +230,10 @@ class MainViewModel(QObject):
             # Convert the deque to a numpy array for emission.
             # Specify dtype for consistency, especially if padding with integers.
             current_data_for_plot = np.array(self.data_buffer, dtype=np.float32)
-
+            self.list_of_ch.append(current_data_for_plot)
             # Emit the `fixed_time_window` (constant X-axis) and the `current_data_for_plot`
             # (the continuously updated signal data) to the connected view.
-            self.data_updated.emit(self.fixed_time_window, current_data_for_plot)
+            self.multi_data_updated.emit(self.fixed_time_window, self.list_of_ch)
         else:
             # If `receive_data()` returns None, it indicates a problem (e.g., disconnected, timeout).
             # Print a message to the console. You might want to add more robust error handling
@@ -262,7 +266,8 @@ class MainViewModel(QObject):
         if self.new_packet_all_channels is not None:
             # Extract data from the first channel (index 0) for plotting.
             # If you need to plot a different channel, change the index here.
-            self.new_data_chunk = self.new_packet_all_channels[self.ch]
+            self.new_data_chunk = self.new_packet_all_channels[self.ch, :]
+            self.list_of_ch.clear()
 
             # Extend the data buffer with the new chunk.
             # Due to `maxlen`, older data will be automatically discarded from the left.
@@ -279,6 +284,7 @@ class MainViewModel(QObject):
             # Specify dtype for consistency, especially if padding with integers.
             current_data_for_plot = np.array(self.data_buffer, dtype=np.float32)
 
+
             ###
             yf = np.fft.fft(current_data_for_plot)
             xf = np.fft.fftfreq(self.samples_per_display_window, 1 / self.effective_sampling_rate)
@@ -287,10 +293,39 @@ class MainViewModel(QObject):
             fft_magnitude = 2.0 / self.samples_per_display_window * np.abs(yf[:self.samples_per_display_window // 2])
             frequencies = xf[:self.samples_per_display_window // 2]
             ###
+            self.list_of_ch.append(fft_magnitude)
 
             # Emit the `fixed_time_window` (constant X-axis) and the `current_data_for_plot`
             # (the continuously updated signal data) to the connected view.
-            self.data_updated.emit(frequencies, fft_magnitude)
+            self.multi_data_updated.emit(frequencies, self.list_of_ch)
+        else:
+            # If `receive_data()` returns None, it indicates a problem (e.g., disconnected, timeout).
+            # Print a message to the console. You might want to add more robust error handling
+            # or UI feedback here (e.g., displaying a "disconnected" status to the user).
+            print("No data received from TCP client. Check connection status or server.")
+            # Optionally, you can uncomment the line below to stop plotting automatically
+            # if no data is received, assuming a continuous stream is essential for the app.
+            # self.stop_plotting()
+
+    def multi_update_data(self):
+        # Fetch new data packet from the client.
+        # This will return a (CHANNELS, SAMPLES_PER_PACKET) NumPy array or None.
+        self.new_packet_all_channels = self.signal_processor.receive_data()
+        if self.new_packet_all_channels is not None:
+            # Extract data from the first channel (index 0) for plotting.
+            # If you need to plot a different channel, change the index here.
+            self.list_of_ch.clear()
+            for i in self.checked_list:
+                self.new_data_chunk = self.new_packet_all_channels[int(i.text())]
+                self.data_buffer.extend(self.new_data_chunk)
+                while len(self.data_buffer) < self.samples_per_display_window:
+                    self.data_buffer.append(0.0)
+                current_data_for_plot = np.array(self.data_buffer, dtype=np.float32)
+                self.list_of_ch.append(current_data_for_plot)
+
+            # Emit the `fixed_time_window` (constant X-axis) and the `current_data_for_plot`
+            # (the continuously updated signal data) to the connected view.
+            self.multi_data_updated.emit(self.fixed_time_window, self.list_of_ch)
         else:
             # If `receive_data()` returns None, it indicates a problem (e.g., disconnected, timeout).
             # Print a message to the console. You might want to add more robust error handling

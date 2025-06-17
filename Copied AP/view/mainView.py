@@ -199,8 +199,6 @@ class MainView(QMainWindow):
         """
         Toggle the plotting state and update button text.
         """
-        if self.diff_ch_state:
-            self.view_model.receive_list(self.list_checked)
 
         if self.view_model.is_plotting:
             self.control_button.setText("Start Plotting")
@@ -210,6 +208,7 @@ class MainView(QMainWindow):
 
         else:
             self.control_button.setText("Stop Plotting")
+            self.view_model.receive_list(self.list_checked)
             self.view_model.start_plotting(self.diff_ch_state, self.current_mode)
             if self.view_model.signal_processor.connected:
                 self.plotting_connected()
@@ -254,7 +253,7 @@ class MainView(QMainWindow):
         ##Connect
         self.view_model = MainViewModel()
         self.control_button.clicked.connect(self.toggle_plotting)
-        self.view_model.data_updated.connect(self.plot_widget.update_data)
+        self.view_model.multi_data_updated.connect(self.plot_widget.multi_update_data)
         self.on_off_butt.setEnabled(False)
 
         ##Linking channel buttons
@@ -356,12 +355,12 @@ class MainView(QMainWindow):
         self.current_mode = "freq_ch"
 
 
-
     def multi_ch(self):
         self.button_group.setExclusive(False)
         self.exclusive_state = False
         self.diff_ch_state = False
         self.clear_selec()
+        self.current_mode = "multi_ch"
 
 
 
