@@ -168,8 +168,8 @@ class MainView(QMainWindow):
         control_centre.addWidget(control_box_2_widget)
         control_centre.addWidget(control_box_3_widget)
 
-        self.plot_widget = VisPyPlotWidget()
         vertical_layout.addWidget(status_ip_txt)
+        self.plot_widget = VisPyPlotWidget()
         vertical_layout.addWidget(self.plot_widget)
 
         bottom_bar = QHBoxLayout()
@@ -253,7 +253,7 @@ class MainView(QMainWindow):
         ##Connect
         self.view_model = MainViewModel()
         self.control_button.clicked.connect(self.toggle_plotting)
-        self.view_model.multi_data_updated.connect(self.plot_widget.multi_update_data)
+        self.view_model.multi_data_updated.connect(self.plot_widget.plot_stuff)
         self.on_off_butt.setEnabled(False)
 
         ##Linking channel buttons
@@ -298,6 +298,7 @@ class MainView(QMainWindow):
         button_name = int(self.sender_button.text())
         self.view_model.change_channel(button_name-1)
         self.list_checked.append(self.sender_button)
+
 
         if self.diff_ch_state:
             self.diff_ch()
