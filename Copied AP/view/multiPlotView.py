@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from vispy import app, scene
 import numpy as np
-from services.signal_processor import SignalProcessor
 
 
 class VisPyPlotWidget(QWidget):
@@ -27,13 +26,6 @@ class VisPyPlotWidget(QWidget):
         """
         super().__init__(parent)
 
-        # signal processor
-        self.sp = SignalProcessor()
-
-        # optional Filters
-        self.filter = self.sp.antifilter
-        
-
         # Create layout
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -52,19 +44,6 @@ class VisPyPlotWidget(QWidget):
         # Set up the view with fixed range
         self.view.camera.set_range(x=(0, 10), y=(-10, 10))
 
-    def set_filter(self, f):
-        # WHY TF DOES PHYTHON NOT HAVE SWITCH??????????????
-        if f == 0:
-            self.filter = self.sp.antifilter
-        elif f == "rms":
-            self.filter = self.sp.calculate_rms
-        elif f == "butter":
-            self.filter = self.sp.butter_filter
-        else:
-            self.filter = self.sp.antifilter
-
-        # self.filter = f
-        
     def update_data(self, time_points, data):
         """
         Update the plot with new data.
@@ -79,9 +58,10 @@ class VisPyPlotWidget(QWidget):
             data (np.ndarray): Array of signal values
         """
         # Create the line data
-        line_data = np.column_stack((time_points, self.filter(data)))
+        line_data = np.column_stack((time_points, data))
         self.line.set_data(line_data)
 
         # Keep the view fixed
-        self.view.camera.set_range(x=(0, 10), y=(-1000, 1000))
+        self.view.camera.set_range(x=(0, 10), y=(-5000, 5000))
         self.canvas.update()
+
