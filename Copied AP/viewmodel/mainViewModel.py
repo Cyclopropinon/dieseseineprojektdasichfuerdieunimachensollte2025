@@ -90,6 +90,13 @@ class MainViewModel(QObject):
         # This ensures the client is ready to receive data as soon as plotting starts.
         self.signal_processor.connect()
         self.list_of_ch = []
+        self.data_buffers_list = []
+
+    def create_buffers(self, no_of_ch):
+        for i in range(no_of_ch):  # Assuming CHANNELS is defined in EMGTCPClient
+            buffer = collections.deque(maxlen=self.samples_per_display_window)
+            buffer.extend(np.zeros(self.samples_per_display_window, dtype=np.float32))
+            self.data_buffers_list.append(buffer)
 
     def start_plotting(self, state, current_mode):
         """
@@ -112,7 +119,6 @@ class MainViewModel(QObject):
                 self.freq_update_data()
             elif current_mode == "multi_ch":
                 self.multi_update_data()
-
 
 
     def stop_plotting(self):
@@ -148,16 +154,19 @@ class MainViewModel(QObject):
         # Fetch new data packet from the client.
         # This will return a (CHANNELS, SAMPLES_PER_PACKET) NumPy array or None.
         self.new_packet_all_channels = self.signal_processor.receive_data()
+        self.data_buffers_list.clear()
 
         if self.new_packet_all_channels is not None:
             # Extract data from the first channel (index 0) for plotting.
             # If you need to plot a different channel, change the index here.
-            self.new_data_chunk = self.new_packet_all_channels[self.ch, :]
+            self.create_buffers(len(self.checked_list))
+            self.new_data_chunk = self.new_packet_all_channels[self.ch - 1, :]
             self.list_of_ch.clear()
 
             # Extend the data buffer with the new chunk.
             # Due to `maxlen`, older data will be automatically discarded from the left.
-            self.data_buffer.extend(self.new_data_chunk)
+
+            self.data_buffers_list[0].extend(self.new_data_chunk)
 
             # In rare cases (e.g., very slow initial data, or if receive_data
             # returns an unexpectedly short chunk due to network issues), the buffer
@@ -208,17 +217,19 @@ class MainViewModel(QObject):
         # Fetch new data packet from the client.
         # This will return a (CHANNELS, SAMPLES_PER_PACKET) NumPy array or None.
         self.new_packet_all_channels = self.signal_processor.receive_data()
+        self.data_buffers_list.clear()
 
         if self.new_packet_all_channels is not None:
             # Extract data from the first channel (index 0) for plotting.
             # If you need to plot a different channel, change the index here.
+            self.create_buffers(len(self.checked_list)-1)
             if len(self.checked_list) == 2:
-                self.diff_data = self.new_packet_all_channels[int(self.checked_list[0].text()), :] - self.new_packet_all_channels[int(self.checked_list[1].text()), :]
+                self.diff_data = self.new_packet_all_channels[int(self.checked_list[0].text())-1, :] - self.new_packet_all_channels[int(self.checked_list[1].text())-1, :]
                 self.list_of_ch.clear()
                 print(self.checked_list[0].text(), self.checked_list[1].text())
             # Extend the data buffer with the new chunk.
             # Due to `maxlen`, older data will be automatically discarded from the left.
-            self.data_buffer.extend(self.diff_data)
+            self.data_buffers_list[0](self.diff_data)
 
             # In rare cases (e.g., very slow initial data, or if receive_data
             # returns an unexpectedly short chunk due to network issues), the buffer
@@ -262,16 +273,18 @@ class MainViewModel(QObject):
         # Fetch new data packet from the client.
         # This will return a (CHANNELS, SAMPLES_PER_PACKET) NumPy array or None.
         self.new_packet_all_channels = self.signal_processor.receive_data()
+        self.data_buffers_list.clear()
 
         if self.new_packet_all_channels is not None:
             # Extract data from the first channel (index 0) for plotting.
             # If you need to plot a different channel, change the index here.
-            self.new_data_chunk = self.new_packet_all_channels[self.ch, :]
+            self.new_data_chunk = self.new_packet_all_channels[self.ch-1, :]
             self.list_of_ch.clear()
+            self.create_buffers(len(self.checked_list))
+            self.data_buffers_list[0].extend(self.new_data_chunk)
 
             # Extend the data buffer with the new chunk.
             # Due to `maxlen`, older data will be automatically discarded from the left.
-            self.data_buffer.extend(self.new_data_chunk)
 
             # In rare cases (e.g., very slow initial data, or if receive_data
             # returns an unexpectedly short chunk due to network issues), the buffer
@@ -311,18 +324,19 @@ class MainViewModel(QObject):
         # Fetch new data packet from the client.
         # This will return a (CHANNELS, SAMPLES_PER_PACKET) NumPy array or None.
         self.new_packet_all_channels = self.signal_processor.receive_data()
+        '''self.data_buffers_list.clear()'''
         if self.new_packet_all_channels is not None:
             # Extract data from the first channel (index 0) for plotting.
             # If you need to plot a different channel, change the index here.
             self.list_of_ch.clear()
+            self.create_buffers(len(self.checked_list))
             for i in self.checked_list:
                 self.new_data_chunk = self.new_packet_all_channels[int(i.text())]
-                self.data_buffer.extend(self.new_data_chunk)
+                self.data_buffers_list[self.checked_list.index(i)].extend(self.new_data_chunk)
                 while len(self.data_buffer) < self.samples_per_display_window:
                     self.data_buffer.append(0.0)
-                current_data_for_plot = np.array(self.data_buffer, dtype=np.float32)
-                self.list_of_ch.append(current_data_for_plot)
-
+                    current_data_for_plot = np.array(self.data_buffer, dtype=np.float32)
+                    self.list_of_ch.append(current_data_for_plot)
             # Emit the `fixed_time_window` (constant X-axis) and the `current_data_for_plot`
             # (the continuously updated signal data) to the connected view.
             self.multi_data_updated.emit(self.fixed_time_window, self.list_of_ch)
