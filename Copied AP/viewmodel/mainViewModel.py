@@ -105,6 +105,7 @@ class MainViewModel(QObject):
         """
         if not self.is_plotting:
             self.is_plotting = True
+            self.data_buffer.clear()
             self.timer.start()
             self.current_mode = current_mode
             self.dispatch_method()
@@ -121,6 +122,7 @@ class MainViewModel(QObject):
         """
         if self.is_plotting:
             self.is_plotting = False
+            self.data_buffer.clear()
             self.timer.stop()
             ##self.signal_processor.close() # Close TCP connection cleanly
 
@@ -179,8 +181,8 @@ class MainViewModel(QObject):
             # if no data is received, assuming a continuous stream is essential for the app.
             # self.stop_plotting()
 
-    def change_channel(self, ch):
-        self.ch = ch
+    def change_channel(self, channel_text):
+        self.ch = channel_text
 
     def receive_list(self, checked_list):
         self.checked_list = list(checked_list)

@@ -115,17 +115,17 @@ class VisPyPlotWidget(QWidget):
             offset_data = data_list[i] + (i * y_offset_per_line)
             line_data = np.column_stack((time_points, offset_data))
             self.line_list[i].set_data(line_data)
-            '''all_y_values.extend(offset_data)'''
+            all_y_values.extend(offset_data)
 
         # Adjust the y-range of the single view based on the combined data
-        '''if len(all_y_values) > 0:
+        if len(all_y_values) > 0:
             min_y, max_y = np.min(all_y_values), np.max(all_y_values)
             # Add a small margin to the range for better visualization
             margin_y = (max_y - min_y) * 0.1 if (max_y - min_y) != 0 else 10
             self.view.camera.set_range(x=self._default_x_range, y=(min_y - margin_y, max_y + margin_y))
         else:
             # Revert to default y-range if no data
-            self.view.camera.set_range(x=self._default_x_range, y=self._default_y_range)'''
+            self.view.camera.set_range(x=self._default_x_range, y=self._default_y_range)
 
 
         self.canvas.update()  # Force a redraw of the canvas

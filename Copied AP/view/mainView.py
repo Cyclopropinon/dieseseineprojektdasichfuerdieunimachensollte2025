@@ -38,7 +38,7 @@ class MainView(QMainWindow):
         # Set up the main window
         self.setWindowTitle("VeryCreativeProjectName")
         self.setGeometry(0, 0, 800, 600)
-        self.showMaximized()  # Enters max screen mode
+        self.showFullScreen()  # Enters max screen mode
 
         # Create central widget and layout
         central_widget = QWidget()
@@ -171,10 +171,10 @@ class MainView(QMainWindow):
         vertical_layout.addWidget(status_ip_txt)
         self.plot_widget = VisPyPlotWidget()
         vertical_layout.addWidget(self.plot_widget)
-        button_raw.clicked.connect(self.plot_widget.set_filter(0))
+        '''button_raw.clicked.connect(self.plot_widget.set_filter(0))
         button_filt.clicked.connect(self.plot_widget.set_filter("butter"))
 
-        button_rms.clicked.connect(self.plot_widget.set_filter("rms"))
+        button_rms.clicked.connect(self.plot_widget.set_filter("rms"))'''
 
         bottom_bar = QHBoxLayout()
         self.control_button = QPushButton("Start Plotting")
@@ -195,6 +195,7 @@ class MainView(QMainWindow):
         main_horizontal_layout.addLayout(vertical_layout)
 
         self.current_mode = ""
+        self.is_connected = False
 
 
 
@@ -243,28 +244,45 @@ class MainView(QMainWindow):
 
     def start_animations(self):
         ## GIF
-        gif_file = "view/cat_waking_up.gif"
-        self.movie = QMovie(gif_file)
-        self.gif.setMovie(self.movie)
-        self.movie.start()
+        if not self.is_connected:
+            self.is_connected = True
+            gif_file = "view/cat_waking_up.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
 
-        ##Audio
-        self.init_audio("view/cat-meow-6226.mp3")
-        self.audio_controller.media_player.play()
-        self.audio_controller.set_looping(False)
+            ##Audio
+            self.init_audio("view/cat-meow-6226.mp3")
+            self.audio_controller.media_player.play()
+            self.audio_controller.set_looping(False)
 
+            ##Connect
+            self.view_model = MainViewModel()
+            self.control_button.clicked.connect(self.toggle_plotting)
+            self.view_model.multi_data_updated.connect(self.plot_widget.plot_stuff)
 
-        ##Connect
-        self.view_model = MainViewModel()
-        self.control_button.clicked.connect(self.toggle_plotting)
-        self.view_model.multi_data_updated.connect(self.plot_widget.plot_stuff)
-        self.on_off_butt.setEnabled(False)
+            ##Linking channel buttons
+            for k in range(0, 32, 1):
+                self.check_list[k].clicked.connect(self.link_channel)
+            self.exclusive_state = False
+            self.button_group.setExclusive(False)
 
-        ##Linking channel buttons
-        for k in range(0, 32, 1):
-            self.check_list[k].clicked.connect(self.link_channel)
-        self.exclusive_state = False
-        self.button_group.setExclusive(False)
+        elif self.is_connected:
+            #STOP CONNECTION
+            self.view_model.signal_processor.close()
+
+            #STOP AUDIO
+            self.audio_controller.media_player.stop()
+
+            #PLAY CLOSING GIF
+            gif_file = "view/cat_goingtosleep.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
+
+            #CLEAR PLOT
+            self.plot_widget.clear_plots()
+
 
     def plotting_connected(self):
         ## GIF
@@ -300,8 +318,16 @@ class MainView(QMainWindow):
     def link_channel(self, state):
         self.sender_button = self.sender()
         button_name = int(self.sender_button.text())
-        self.view_model.change_channel(button_name-1)
+        self.view_model.change_channel(button_name)
         self.list_checked.append(self.sender_button)
+
+        #CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        self.audio_controller.media_player.pause()
+        self.movie.setPaused(True)
+
 
 
         if self.diff_ch_state:
@@ -329,6 +355,7 @@ class MainView(QMainWindow):
         for button in self.list_checked:
             button.setChecked(False)
         self.list_checked.clear()
+        self.plot_widget.clear_plots()
 
 
         # Re-enable exclusivity
