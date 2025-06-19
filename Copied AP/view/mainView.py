@@ -204,7 +204,6 @@ class MainView(QMainWindow):
         """
         Toggle the plotting state and update button text.
         """
-
         if self.view_model.is_plotting:
             self.control_button.setText("Start Plotting")
             self.view_model.stop_plotting()
@@ -212,11 +211,13 @@ class MainView(QMainWindow):
             self.movie.setPaused(True)
 
         else:
+            print(self.plot_widget.cleared)
             self.control_button.setText("Stop Plotting")
             self.view_model.receive_list(self.list_checked)
             self.view_model.start_plotting(self.current_mode)
             if self.view_model.signal_processor.connected:
                 self.plotting_connected()
+            print(self.plot_widget.cleared)
 
     def show_credits_dialog(self):
         """
@@ -267,8 +268,11 @@ class MainView(QMainWindow):
             self.exclusive_state = False
             self.button_group.setExclusive(False)
 
-        elif self.is_connected:
+        elif self.is_connected and self.plot_widget.cleared:
             #STOP CONNECTION
+            self.is_connected = False
+            self.view_model.stop_plotting()
+            self.clear_selec()
             self.view_model.signal_processor.close()
 
             #STOP AUDIO
@@ -283,6 +287,24 @@ class MainView(QMainWindow):
             #CLEAR PLOT
             self.plot_widget.clear_plots()
 
+        elif self.is_connected and not self.plot_widget.cleared:
+            #STOP CONNECTION
+            self.is_connected = False
+            self.view_model.stop_plotting()
+            self.clear_selec()
+            self.view_model.signal_processor.close()
+
+            #STOP AUDIO
+            self.audio_controller.media_player.stop()
+
+            #PLAY CLOSING GIF
+            gif_file = "view/cat_sleep_running.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
+
+            #CLEAR PLOT
+            self.plot_widget.clear_plots()
 
     def plotting_connected(self):
         ## GIF
@@ -315,7 +337,7 @@ class MainView(QMainWindow):
         self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
         self.current_file = audio_file
 
-    def link_channel(self, state):
+    def link_channel(self):
         self.sender_button = self.sender()
         button_name = int(self.sender_button.text())
         self.view_model.change_channel(button_name)
@@ -325,10 +347,13 @@ class MainView(QMainWindow):
         self.plot_widget.clear_plots()
         self.control_button.setText("Start Plotting")
         self.view_model.stop_plotting()
-        self.audio_controller.media_player.pause()
+        #START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
         self.movie.setPaused(True)
-
-
+        self.audio_controller.media_player.pause()
 
         if self.diff_ch_state:
             self.diff_ch()
@@ -337,6 +362,19 @@ class MainView(QMainWindow):
 
 
     def indi_ch(self):
+
+        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        # START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
+        self.movie.setPaused(True)
+        self.audio_controller.media_player.pause()
+
         self.button_group.setExclusive(True)
         self.exclusive_state = True
         self.diff_ch_state = False
@@ -363,6 +401,19 @@ class MainView(QMainWindow):
         print("All checkboxes cleared.")
 
     def diff_ch(self):
+
+        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        # START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
+        self.movie.setPaused(True)
+        self.audio_controller.media_player.pause()
+
         print("called")
         self.button_group.setExclusive(False)
         self.exclusive_state = False
@@ -380,6 +431,19 @@ class MainView(QMainWindow):
 
 
     def freq_anal(self):
+
+        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        # START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
+        self.movie.setPaused(True)
+        self.audio_controller.media_player.pause()
+
         self.button_group.setExclusive(True)
         self.exclusive_state = True
         self.diff_ch_state = False
@@ -388,6 +452,19 @@ class MainView(QMainWindow):
 
 
     def multi_ch(self):
+
+        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        # START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
+        self.movie.setPaused(True)
+        self.audio_controller.media_player.pause()
+
         self.button_group.setExclusive(False)
         self.exclusive_state = False
         self.diff_ch_state = False

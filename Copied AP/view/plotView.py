@@ -45,6 +45,7 @@ class VisPyPlotWidget(QWidget):
 
         # Set initial range for the single view's camera
         self.view.camera.set_range(x=self._default_x_range, y=self._default_y_range)
+        self.cleared = True
 
     def setup_plots(self, num_lines):
         """
@@ -83,6 +84,7 @@ class VisPyPlotWidget(QWidget):
         self.line_list.clear()
         self._num_plots = 0
         self.canvas.update()
+        self.cleared = True
 
     def update_data(self, time_points, data_list, y_offset_per_line=1000):
         """
@@ -141,3 +143,5 @@ class VisPyPlotWidget(QWidget):
 
         self.setup_plots(len(data_list))
         self.update_data(time_points, data_list)
+        self.cleared = False
+
