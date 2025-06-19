@@ -209,7 +209,7 @@ class MainView(QMainWindow):
         else:
             self.control_button.setText("Stop Plotting")
             self.view_model.receive_list(self.list_checked)
-            self.view_model.start_plotting(self.diff_ch_state, self.current_mode)
+            self.view_model.start_plotting(self.current_mode)
             if self.view_model.signal_processor.connected:
                 self.plotting_connected()
 
@@ -302,8 +302,6 @@ class MainView(QMainWindow):
 
         if self.diff_ch_state:
             self.diff_ch()
-            if state == Qt.Unchecked and self.sender_button in self.list_checked:
-                self.list_checked.remove(self.sender_button)
 
 
 
@@ -334,6 +332,7 @@ class MainView(QMainWindow):
         print("All checkboxes cleared.")
 
     def diff_ch(self):
+        print("called")
         self.button_group.setExclusive(False)
         self.exclusive_state = False
         self.current_mode = "diff_ch"
@@ -346,6 +345,7 @@ class MainView(QMainWindow):
         if len(self.list_checked) > 2:
             self.sender_button.setChecked(False)
             self.list_checked.remove(self.sender_button)
+
 
 
     def freq_anal(self):
@@ -362,9 +362,6 @@ class MainView(QMainWindow):
         self.diff_ch_state = False
         self.clear_selec()
         self.current_mode = "multi_ch"
-
-
-
 
 
 

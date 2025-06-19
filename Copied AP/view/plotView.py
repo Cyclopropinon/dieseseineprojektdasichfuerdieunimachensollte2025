@@ -84,7 +84,7 @@ class VisPyPlotWidget(QWidget):
         self._num_plots = 0
         self.canvas.update()
 
-    def update_data(self, time_points, data_list, y_offset_per_line=1):
+    def update_data(self, time_points, data_list, y_offset_per_line=1000):
         """
         Update the plots with new data.
 
@@ -138,6 +138,6 @@ class VisPyPlotWidget(QWidget):
         data_list (list of np.ndarray): List of signal values for each line.
         y_offset_per_line (float): The vertical offset to apply to each consecutive line.
         """
-        print(len(data_list))
+
         self.setup_plots(len(data_list))
         self.update_data(time_points, data_list)
