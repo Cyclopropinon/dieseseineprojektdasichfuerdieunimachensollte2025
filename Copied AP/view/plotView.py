@@ -113,6 +113,10 @@ class VisPyPlotWidget(QWidget):
         all_y_values = []
 
         # Update each line individually with offset
+        # TODO bliblablubb filter
+        # des ding da ordner tauschn
+        # sambling rate ist gehartkoded. müssma ändern!!!!!!!!!!!!!!!!
+
         for i in range(len(data_list)):
             offset_data = data_list[i] + (i * y_offset_per_line)
             line_data = np.column_stack((time_points, offset_data))
