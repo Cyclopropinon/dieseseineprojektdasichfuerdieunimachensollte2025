@@ -62,31 +62,3 @@ class SignalProcessor:
         b, a = signal.butter(4, [low, high], btype='band')
         filtered_data = signal.filtfilt(b, a, channel_data[20, :])
         return filtered_data
-        
-    def generate_test_signal(self, duration=60):
-        """
-        Generate a test signal for live plotting demonstration.
-        
-        This method creates a sine wave with:
-        - Period of 2 seconds (0.5 Hz)
-        - Amplitude of 3 (oscillates between -3 and 3)
-        - Added Gaussian noise for realism
-        
-        Args:
-            duration (int): Total duration of the signal in seconds (default: 60)
-            
-        Returns:
-            tuple: (time_points, signal_data)
-                - time_points: Array of time values in seconds
-                - signal_data: Array of signal values
-        """
-        # Create time points for the entire signal duration
-        t = np.linspace(0, duration, duration * self.sampling_rate)
-        
-        # Generate sine wave with 2s period (0.5 Hz) and amplitude 3
-        signal = 3 * np.sin(2 * np.pi * 0.5 * t)
-        
-        # Add small random noise for realism
-        signal += np.random.normal(0, 0.2, len(t))
-        
-        return t, signal

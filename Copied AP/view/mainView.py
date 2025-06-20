@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QPushButton, \
-    QSpacerItem, QSizePolicy, QCheckBox, QButtonGroup
+    QSpacerItem, QSizePolicy, QCheckBox, QButtonGroup, QFrame
 from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -58,9 +58,9 @@ class MainView(QMainWindow):
         self.on_off_butt = QPushButton("MAIN SWITCH")
         self.on_off_butt.setFixedSize(100, 100);
         self.on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
-        status_ip_txt = QLabel("Status: CONNECTED Host: localhost Port:12345")
-        status_ip_txt.setFixedHeight(30)
-        status_ip_txt.setAlignment(Qt.AlignCenter)
+        self.status_ip_txt = QLabel("Status: DISCONNECTED  Host: ---------  Port: -----")
+        self.status_ip_txt.setFixedHeight(30)
+        self.status_ip_txt.setAlignment(Qt.AlignCenter)
         self.on_off_butt.clicked.connect(self.start_animations)
 
         self.gif = QLabel()
@@ -88,6 +88,19 @@ class MainView(QMainWindow):
 
         control_box_1 = QVBoxLayout()
         control_box_1_widget = QWidget()
+        control_box_1_widget.setObjectName("control_box_1_widget")
+        control_box_1_widget.setStyleSheet("""
+            #control_box_1_widget {
+                border: 2px solid #000000; /* Black border */
+                background-color: #808080; /* Gray background */
+            }
+            
+            #control_box_1_widget QPushButton:hover {
+                background-color: #D3D3D3; /* Darker blue on hover */
+                border-radius: 5px;        /* Slightly rounded button corners */
+                
+            }
+        """)
         control_box_1_widget.setLayout(control_box_1)
         control_box_1_butt_group = QButtonGroup()
         control_box_1_butt_group.setExclusive(True)
@@ -106,6 +119,7 @@ class MainView(QMainWindow):
 
         self.diff_ch_state = False
 
+        control_box_1.addWidget(self.status_ip_txt)
         control_box_1.addWidget(butt_plot_indi_ch)
         control_box_1.addWidget(self.butt_diff_ch)
         control_box_1.addWidget(butt_freq_domain_anal)
@@ -126,6 +140,7 @@ class MainView(QMainWindow):
         control_box_3_widget = QWidget()
         control_box_3_widget.setLayout(control_box_3)
         select_channels_label = QLabel("Select Channels")
+        select_channels_label.setFixedHeight(50)
         select_channels_label.setStyleSheet("border: 2px solid white")
         select_channels_label.setAlignment(Qt.AlignCenter)
 
@@ -168,7 +183,7 @@ class MainView(QMainWindow):
         control_centre.addWidget(control_box_2_widget)
         control_centre.addWidget(control_box_3_widget)
 
-        vertical_layout.addWidget(status_ip_txt)
+        ##vertical_layout.addWidget(self.status_ip_txt)
         self.plot_widget = VisPyPlotWidget()
         vertical_layout.addWidget(self.plot_widget)
         '''button_raw.clicked.connect(self.plot_widget.set_filter(0))
@@ -191,6 +206,7 @@ class MainView(QMainWindow):
 
         vertical_layout.addLayout(bottom_bar)
 
+
         main_horizontal_layout.addWidget(control_centre_widget)
         main_horizontal_layout.addLayout(vertical_layout)
 
@@ -211,13 +227,11 @@ class MainView(QMainWindow):
             self.movie.setPaused(True)
 
         else:
-            print(self.plot_widget.cleared)
             self.control_button.setText("Stop Plotting")
             self.view_model.receive_list(self.list_checked)
             self.view_model.start_plotting(self.current_mode)
             if self.view_model.signal_processor.connected:
                 self.plotting_connected()
-            print(self.plot_widget.cleared)
 
     def show_credits_dialog(self):
         """
@@ -246,6 +260,7 @@ class MainView(QMainWindow):
     def start_animations(self):
         ## GIF
         if not self.is_connected:
+            self.status_ip_txt.setText("Status: CONNECTED  Host: localhost  Port: 12345")
             self.is_connected = True
             gif_file = "view/cat_waking_up.gif"
             self.movie = QMovie(gif_file)
@@ -269,6 +284,7 @@ class MainView(QMainWindow):
             self.button_group.setExclusive(False)
 
         elif self.is_connected and self.plot_widget.cleared:
+            self.status_ip_txt.setText("Status: DISCONNECTED  Host: ---------  Port: -----")
             #STOP CONNECTION
             self.is_connected = False
             self.view_model.stop_plotting()
@@ -288,6 +304,7 @@ class MainView(QMainWindow):
             self.plot_widget.clear_plots()
 
         elif self.is_connected and not self.plot_widget.cleared:
+            self.status_ip_txt.setText("Status: DISCONNECTED  Host: ---------  Port: -----")
             #STOP CONNECTION
             self.is_connected = False
             self.view_model.stop_plotting()
@@ -414,7 +431,6 @@ class MainView(QMainWindow):
         self.movie.setPaused(True)
         self.audio_controller.media_player.pause()
 
-        print("called")
         self.button_group.setExclusive(False)
         self.exclusive_state = False
         self.current_mode = "diff_ch"
