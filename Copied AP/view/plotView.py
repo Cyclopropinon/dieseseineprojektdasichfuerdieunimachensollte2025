@@ -51,6 +51,7 @@ class VisPyPlotWidget(QWidget):
         self.view.camera.set_range(x=(0, 10), y=(-10, 10))
 
     def set_filter(self, f):
+        print("set_filter(" + str(f) + ")")
         # WHY TF DOES PHYTHON NOT HAVE SWITCH??????????????
         if f == 0:
             self.filter = self.sp.antifilter
@@ -64,6 +65,7 @@ class VisPyPlotWidget(QWidget):
         # self.filter = f
         
     def update_data(self, time_points, data):
+        print("baum: " + str(self.filter))
         """
         Update the plot with new data.
         
