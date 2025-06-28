@@ -138,7 +138,8 @@ class VisPyPlotWidget(QWidget):
         # sambling rate ist gehartkoded. müssma ändern!!!!!!!!!!!!!!!!
 
         for i in range(len(data_list)):
-            offset_data = data_list[i] + (i * y_offset_per_line)
+            filtered_data = self.filter(data_list[i]) # Filter
+            offset_data = filtered_data + (i * y_offset_per_line)
             line_data = np.column_stack((time_points, offset_data))
             self.line_list[i].set_data(line_data)
             all_y_values.extend(offset_data)
