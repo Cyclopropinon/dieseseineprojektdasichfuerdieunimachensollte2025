@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QPushButton, \
-    QSpacerItem, QSizePolicy, QCheckBox, QButtonGroup
+    QSpacerItem, QSizePolicy, QCheckBox, QButtonGroup, QFrame
 from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -38,7 +38,7 @@ class MainView(QMainWindow):
         # Set up the main window
         self.setWindowTitle("VeryCreativeProjectName")
         self.setGeometry(0, 0, 800, 600)
-        self.showMaximized()  # Enters max screen mode
+        self.showFullScreen()  # Enters max screen mode
 
         # Create central widget and layout
         central_widget = QWidget()
@@ -58,9 +58,9 @@ class MainView(QMainWindow):
         self.on_off_butt = QPushButton("MAIN SWITCH")
         self.on_off_butt.setFixedSize(100, 100);
         self.on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
-        status_ip_txt = QLabel("Status: CONNECTED Host: localhost Port:12345")
-        status_ip_txt.setFixedHeight(30)
-        status_ip_txt.setAlignment(Qt.AlignCenter)
+        self.status_ip_txt = QLabel("Status: DISCONNECTED  Host: ---------  Port: -----")
+        self.status_ip_txt.setFixedHeight(30)
+        self.status_ip_txt.setAlignment(Qt.AlignCenter)
         self.on_off_butt.clicked.connect(self.start_animations)
 
         self.gif = QLabel()
@@ -88,6 +88,19 @@ class MainView(QMainWindow):
 
         control_box_1 = QVBoxLayout()
         control_box_1_widget = QWidget()
+        control_box_1_widget.setObjectName("control_box_1_widget")
+        control_box_1_widget.setStyleSheet("""
+            #control_box_1_widget {
+                border: 2px solid #000000; /* Black border */
+                background-color: #808080; /* Gray background */
+            }
+            
+            #control_box_1_widget QPushButton:hover {
+                background-color: #D3D3D3; /* Darker blue on hover */
+                border-radius: 5px;        /* Slightly rounded button corners */
+                
+            }
+        """)
         control_box_1_widget.setLayout(control_box_1)
         control_box_1_butt_group = QButtonGroup()
         control_box_1_butt_group.setExclusive(True)
@@ -106,6 +119,7 @@ class MainView(QMainWindow):
 
         self.diff_ch_state = False
 
+        control_box_1.addWidget(self.status_ip_txt)
         control_box_1.addWidget(butt_plot_indi_ch)
         control_box_1.addWidget(self.butt_diff_ch)
         control_box_1.addWidget(butt_freq_domain_anal)
@@ -126,6 +140,7 @@ class MainView(QMainWindow):
         control_box_3_widget = QWidget()
         control_box_3_widget.setLayout(control_box_3)
         select_channels_label = QLabel("Select Channels")
+        select_channels_label.setFixedHeight(50)
         select_channels_label.setStyleSheet("border: 2px solid white")
         select_channels_label.setAlignment(Qt.AlignCenter)
 
@@ -168,9 +183,10 @@ class MainView(QMainWindow):
         control_centre.addWidget(control_box_2_widget)
         control_centre.addWidget(control_box_3_widget)
 
+        ##vertical_layout.addWidget(self.status_ip_txt)
         self.plot_widget = VisPyPlotWidget()
-        vertical_layout.addWidget(status_ip_txt)
         vertical_layout.addWidget(self.plot_widget)
+        ## TODO Check if works
         button_raw.clicked.connect(lambda: self.plot_widget.set_filter(0))
         button_filt.clicked.connect(lambda: self.plot_widget.set_filter("butter"))
         button_rms.clicked.connect(lambda: self.plot_widget.set_filter("rms"))
@@ -190,10 +206,12 @@ class MainView(QMainWindow):
 
         vertical_layout.addLayout(bottom_bar)
 
+
         main_horizontal_layout.addWidget(control_centre_widget)
         main_horizontal_layout.addLayout(vertical_layout)
 
         self.current_mode = ""
+        self.is_connected = False
 
 
 
@@ -202,9 +220,6 @@ class MainView(QMainWindow):
         """
         Toggle the plotting state and update button text.
         """
-        if self.diff_ch_state:
-            self.view_model.receive_list(self.list_checked)
-
         if self.view_model.is_plotting:
             self.control_button.setText("Start Plotting")
             self.view_model.stop_plotting()
@@ -213,7 +228,8 @@ class MainView(QMainWindow):
 
         else:
             self.control_button.setText("Stop Plotting")
-            self.view_model.start_plotting(self.diff_ch_state, self.current_mode)
+            self.view_model.receive_list(self.list_checked)
+            self.view_model.start_plotting(self.current_mode)
             if self.view_model.signal_processor.connected:
                 self.plotting_connected()
 
@@ -243,28 +259,69 @@ class MainView(QMainWindow):
 
     def start_animations(self):
         ## GIF
-        gif_file = "view/cat_waking_up.gif"
-        self.movie = QMovie(gif_file)
-        self.gif.setMovie(self.movie)
-        self.movie.start()
+        if not self.is_connected:
+            self.status_ip_txt.setText("Status: CONNECTED  Host: localhost  Port: 12345")
+            self.is_connected = True
+            gif_file = "view/cat_waking_up.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
 
-        ##Audio
-        self.init_audio("view/cat-meow-6226.mp3")
-        self.audio_controller.media_player.play()
-        self.audio_controller.set_looping(False)
+            ##Audio
+            self.init_audio("view/cat-meow-6226.mp3")
+            self.audio_controller.media_player.play()
+            self.audio_controller.set_looping(False)
 
+            ##Connect
+            self.view_model = MainViewModel()
+            self.control_button.clicked.connect(self.toggle_plotting)
+            self.view_model.multi_data_updated.connect(self.plot_widget.plot_stuff)
 
-        ##Connect
-        self.view_model = MainViewModel()
-        self.control_button.clicked.connect(self.toggle_plotting)
-        self.view_model.data_updated.connect(self.plot_widget.update_data)
-        self.on_off_butt.setEnabled(False)
+            ##Linking channel buttons
+            for k in range(0, 32, 1):
+                self.check_list[k].clicked.connect(self.link_channel)
+            self.exclusive_state = False
+            self.button_group.setExclusive(False)
 
-        ##Linking channel buttons
-        for k in range(0, 32, 1):
-            self.check_list[k].clicked.connect(self.link_channel)
-        self.exclusive_state = False
-        self.button_group.setExclusive(False)
+        elif self.is_connected and self.plot_widget.cleared:
+            self.status_ip_txt.setText("Status: DISCONNECTED  Host: ---------  Port: -----")
+            #STOP CONNECTION
+            self.is_connected = False
+            self.view_model.stop_plotting()
+            self.clear_selec()
+            self.view_model.signal_processor.close()
+
+            #STOP AUDIO
+            self.audio_controller.media_player.stop()
+
+            #PLAY CLOSING GIF
+            gif_file = "view/cat_goingtosleep.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
+
+            #CLEAR PLOT
+            self.plot_widget.clear_plots()
+
+        elif self.is_connected and not self.plot_widget.cleared:
+            self.status_ip_txt.setText("Status: DISCONNECTED  Host: ---------  Port: -----")
+            #STOP CONNECTION
+            self.is_connected = False
+            self.view_model.stop_plotting()
+            self.clear_selec()
+            self.view_model.signal_processor.close()
+
+            #STOP AUDIO
+            self.audio_controller.media_player.stop()
+
+            #PLAY CLOSING GIF
+            gif_file = "view/cat_sleep_running.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
+
+            #CLEAR PLOT
+            self.plot_widget.clear_plots()
 
     def plotting_connected(self):
         ## GIF
@@ -297,21 +354,44 @@ class MainView(QMainWindow):
         self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
         self.current_file = audio_file
 
-    def link_channel(self, state):
+    def link_channel(self):
         self.sender_button = self.sender()
         button_name = int(self.sender_button.text())
-        self.view_model.change_channel(button_name-1)
+        self.view_model.change_channel(button_name)
         self.list_checked.append(self.sender_button)
+
+        #CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        #START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
+        self.movie.setPaused(True)
+        self.audio_controller.media_player.pause()
 
         if self.diff_ch_state:
             self.diff_ch()
-            if state == Qt.Unchecked and self.sender_button in self.list_checked:
-                self.list_checked.remove(self.sender_button)
 
 
 
 
     def indi_ch(self):
+
+        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        # START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
+        self.movie.setPaused(True)
+        self.audio_controller.media_player.pause()
+
         self.button_group.setExclusive(True)
         self.exclusive_state = True
         self.diff_ch_state = False
@@ -330,6 +410,7 @@ class MainView(QMainWindow):
         for button in self.list_checked:
             button.setChecked(False)
         self.list_checked.clear()
+        self.plot_widget.clear_plots()
 
 
         # Re-enable exclusivity
@@ -337,6 +418,19 @@ class MainView(QMainWindow):
         print("All checkboxes cleared.")
 
     def diff_ch(self):
+
+        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        # START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
+        self.movie.setPaused(True)
+        self.audio_controller.media_player.pause()
+
         self.button_group.setExclusive(False)
         self.exclusive_state = False
         self.current_mode = "diff_ch"
@@ -351,7 +445,21 @@ class MainView(QMainWindow):
             self.list_checked.remove(self.sender_button)
 
 
+
     def freq_anal(self):
+
+        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        # START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
+        self.movie.setPaused(True)
+        self.audio_controller.media_player.pause()
+
         self.button_group.setExclusive(True)
         self.exclusive_state = True
         self.diff_ch_state = False
@@ -359,15 +467,25 @@ class MainView(QMainWindow):
         self.current_mode = "freq_ch"
 
 
-
     def multi_ch(self):
+
+        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+        self.plot_widget.clear_plots()
+        self.control_button.setText("Start Plotting")
+        self.view_model.stop_plotting()
+        # START NEW GIF OF STATIONARY CAT
+        gif_file = "view/cat stationary.gif"
+        self.movie = QMovie(gif_file)
+        self.gif.setMovie(self.movie)
+        self.movie.start()
+        self.movie.setPaused(True)
+        self.audio_controller.media_player.pause()
+
         self.button_group.setExclusive(False)
         self.exclusive_state = False
         self.diff_ch_state = False
         self.clear_selec()
-
-
-
+        self.current_mode = "multi_ch"
 
 
 

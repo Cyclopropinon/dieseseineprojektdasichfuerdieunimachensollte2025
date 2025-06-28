@@ -45,22 +45,7 @@ class VisPyPlotWidget(QWidget):
 
         # Set initial range for the single view's camera
         self.view.camera.set_range(x=self._default_x_range, y=self._default_y_range)
-        self.cleared = True
 
-    def set_filter(self, f):
-        print("set_filter(" + str(f) + ")")
-        # WHY TF DOES PHYTHON NOT HAVE SWITCH??????????????
-        if f == 0:
-            self.filter = self.sp.antifilter
-        elif f == "rms":
-            self.filter = self.sp.calculate_rms
-        elif f == "butter":
-            self.filter = self.sp.butter_filter
-        else:
-            self.filter = self.sp.antifilter
-
-        # self.filter = f
-        
     def setup_plots(self, num_lines):
         """
         Dynamically creates the specified number of line plots within the single view.
@@ -98,9 +83,8 @@ class VisPyPlotWidget(QWidget):
         self.line_list.clear()
         self._num_plots = 0
         self.canvas.update()
-        self.cleared = True
 
-    def update_data(self, time_points, data_list, y_offset_per_line=1000):
+    def update_data(self, time_points, data_list, y_offset_per_line=1):
         """
         Update the plots with new data.
 
@@ -127,25 +111,21 @@ class VisPyPlotWidget(QWidget):
         all_y_values = []
 
         # Update each line individually with offset
-        # TODO bliblablubb filter
-        # des ding da ordner tauschn
-        # sambling rate ist gehartkoded. müssma ändern!!!!!!!!!!!!!!!!
-
         for i in range(len(data_list)):
             offset_data = data_list[i] + (i * y_offset_per_line)
             line_data = np.column_stack((time_points, offset_data))
             self.line_list[i].set_data(line_data)
-            all_y_values.extend(offset_data)
+            '''all_y_values.extend(offset_data)'''
 
         # Adjust the y-range of the single view based on the combined data
-        if len(all_y_values) > 0:
+        '''if len(all_y_values) > 0:
             min_y, max_y = np.min(all_y_values), np.max(all_y_values)
             # Add a small margin to the range for better visualization
             margin_y = (max_y - min_y) * 0.1 if (max_y - min_y) != 0 else 10
             self.view.camera.set_range(x=self._default_x_range, y=(min_y - margin_y, max_y + margin_y))
         else:
             # Revert to default y-range if no data
-            self.view.camera.set_range(x=self._default_x_range, y=self._default_y_range)
+            self.view.camera.set_range(x=self._default_x_range, y=self._default_y_range)'''
 
 
         self.canvas.update()  # Force a redraw of the canvas
@@ -158,8 +138,6 @@ class VisPyPlotWidget(QWidget):
         data_list (list of np.ndarray): List of signal values for each line.
         y_offset_per_line (float): The vertical offset to apply to each consecutive line.
         """
-
+        print(len(data_list))
         self.setup_plots(len(data_list))
         self.update_data(time_points, data_list)
-        self.cleared = False
-
