@@ -186,7 +186,6 @@ class MainView(QMainWindow):
         ##vertical_layout.addWidget(self.status_ip_txt)
         self.plot_widget = VisPyPlotWidget()
         vertical_layout.addWidget(self.plot_widget)
-        ## TODO Check if works
         button_raw.clicked.connect(lambda: self.plot_widget.set_filter(0))
         button_filt.clicked.connect(lambda: self.plot_widget.set_filter("butter"))
         button_rms.clicked.connect(lambda: self.plot_widget.set_filter("rms"))

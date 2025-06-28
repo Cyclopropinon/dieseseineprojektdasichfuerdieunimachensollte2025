@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from vispy import app, scene
 from vispy.color import Color
 import numpy as np
-from services.signal_processor import SignalProcessor
+from Signalverarbeitung.signal_processor import SignalProcessor
 
 class VisPyPlotWidget(QWidget):
     """
@@ -133,8 +133,6 @@ class VisPyPlotWidget(QWidget):
         all_y_values = []
 
         # Update each line individually with offset
-        # TODO bliblablubb filter
-        # des ding da ordner tauschn
         # sambling rate ist gehartkoded. müssma ändern!!!!!!!!!!!!!!!!
 
         for i in range(len(data_list)):
