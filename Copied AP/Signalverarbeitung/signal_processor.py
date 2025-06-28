@@ -16,7 +16,7 @@ class SignalProcessor:
         points_per_window (int): Total number of points in the display window
     """
     
-    def __init__(self, window_size=10, sampling_rate=545.5):
+    def __init__(self, sampling_rate=545.5, window_size=10):
         """
         Initialize the signal processor with window and sampling parameters.
         

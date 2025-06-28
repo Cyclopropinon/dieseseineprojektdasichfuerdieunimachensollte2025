@@ -28,7 +28,7 @@ class VisPyPlotWidget(QWidget):
         layout = QVBoxLayout(self)  # Set layout directly on self
 
         # signal processor
-        self.sp = SignalProcessor()
+        self.sp = SignalProcessor(545.5) # i have no idea how we receive this lol
 
         # optional Filters
         self.filter = self.sp.antifilter
@@ -133,8 +133,6 @@ class VisPyPlotWidget(QWidget):
         all_y_values = []
 
         # Update each line individually with offset
-        # sambling rate ist gehartkoded. müssma ändern!!!!!!!!!!!!!!!!
-
         for i in range(len(data_list)):
             filtered_data = self.filter(data_list[i]) # Filter
             offset_data = filtered_data + (i * y_offset_per_line)
