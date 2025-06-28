@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from vispy import app, scene
 from vispy.color import Color
 import numpy as np
-
+from services.signal_processor import SignalProcessor
 
 class VisPyPlotWidget(QWidget):
     """
@@ -27,6 +27,12 @@ class VisPyPlotWidget(QWidget):
         # Create PyQt layout
         layout = QVBoxLayout(self)  # Set layout directly on self
 
+        # signal processor
+        self.sp = SignalProcessor()
+
+        # optional Filters
+        self.filter = self.sp.antifilter
+        
         # Create VisPy canvas
         self.canvas = scene.SceneCanvas(keys='interactive', size=(800, 400))
         layout.addWidget(self.canvas.native)
