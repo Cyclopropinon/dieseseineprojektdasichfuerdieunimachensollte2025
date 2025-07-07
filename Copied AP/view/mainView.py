@@ -233,6 +233,8 @@ class MainView(QMainWindow):
             if self.view_model.signal_processor.connected:
                 self.plotting_connected()
 
+        print(self.list_checked)
+
     def show_credits_dialog(self):
         """
         Slot method to create and show the CreditsDialog when the button is clicked.
@@ -358,7 +360,13 @@ class MainView(QMainWindow):
         self.sender_button = self.sender()
         button_name = int(self.sender_button.text())
         self.view_model.change_channel(button_name)
-        self.list_checked.append(self.sender_button)
+
+        if self.sender_button in self.list_checked:
+            self.list_checked.remove(self.sender_button)
+            print(self.sender_button.text(), "Removed")
+        else:
+            self.list_checked.append(self.sender_button)
+            print(self.sender_button.text(), "Added")
 
         #CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
         self.plot_widget.clear_plots()
