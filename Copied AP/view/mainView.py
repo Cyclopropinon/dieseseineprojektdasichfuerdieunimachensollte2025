@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from .credits import CreditsDialog
-from PyQt5.QtGui import QMovie, QFont
+from PyQt5.QtGui import QMovie, QFontDatabase, QFont
 from .audio import AudioController
 from viewmodel.mainViewModel import MainViewModel
 import sys
@@ -77,7 +77,10 @@ class MainView(QMainWindow):
         Werbung.setAlignment(Qt.AlignCenter)
         Werbung.setWordWrap(True)
 
-        fontt = QFont("Arial", 20)
+        # Load custom font
+        font_id = QFontDatabase.addApplicationFont("view/werbung.ttf")
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        fontt = QFont(font_family, 24)  # Set font size as needed
         fontt.setBold(True)
         Werbung.setFont(fontt)
 
