@@ -62,7 +62,7 @@ class MainView(QMainWindow):
         self.on_off_butt.setFixedSize(100, 100);
         self.on_off_butt.setObjectName("startButton")
         self.on_off_butt.setStyleSheet("""
-                    #startButton {background-color: #4CAF50;color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: none;}
+                    #startButton {background-color: #4CAF50;color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: 3px solid #2e6930;}
                     #startButton:hover {background-color: #45a049;}
                 """)
 
@@ -304,7 +304,7 @@ class MainView(QMainWindow):
         ## GIF
         if not self.is_connected:
             self.on_off_butt.setStyleSheet("""
-                                            #startButton {background-color: #e21f1f; color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: none;}
+                                            #startButton {background-color: #e21f1f; color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: 3px solid #881313;}
                                             #startButton:hover {background-color: #c91b1b;}
                                         """)
             self.on_off_butt.setText("Stop")
@@ -333,7 +333,7 @@ class MainView(QMainWindow):
 
         elif self.is_connected and self.plot_widget.cleared:
             self.on_off_butt.setStyleSheet("""
-                                #startButton {background-color: #4CAF50;color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: none;}
+                                #startButton {background-color: #4CAF50;color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: 3px solid #2e6930;}
                                 #startButton:hover {background-color: #45a049;}
                             """)
             self.on_off_butt.setText("Start")
@@ -357,6 +357,11 @@ class MainView(QMainWindow):
             self.plot_widget.clear_plots()
 
         elif self.is_connected and not self.plot_widget.cleared:
+            self.on_off_butt.setStyleSheet("""
+                                            #startButton {background-color: #4CAF50;color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: 3px solid #2e6930;}
+                                            #startButton:hover {background-color: #45a049;}
+                                        """)
+            self.on_off_butt.setText("Start")
             self.status_ip_txt.setText("Status: DISCONNECTED  Host: ---------  Port: -----")
             #STOP CONNECTION
             self.is_connected = False
