@@ -39,10 +39,13 @@ class MainView(QMainWindow):
         self.setWindowTitle("VeryCreativeProjectName")
         self.setGeometry(0, 0, 800, 600)
         self.showMaximized()  # Enters max screen mode
+        ##self.showFullScreen() #Enters Full Screen
 
         # Create central widget and layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
+
+        self.setStyleSheet("""QMainWindow {background-color: #323232; /* Dark Grey */}""")
 
         ## sets a kuhl border so we can see the dingsdas
         ##central_widget.setStyleSheet("border: 1px solid red;")
@@ -59,7 +62,8 @@ class MainView(QMainWindow):
         self.on_off_butt.setFixedSize(100, 100);
         self.on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
         self.status_ip_txt = QLabel("Status: DISCONNECTED  Host: ---------  Port: -----")
-        self.status_ip_txt.setFixedHeight(30)
+        self.status_ip_txt.setStyleSheet("border: 1px solid #ffffff ; background-color: #404040; border-radius: 5px;")
+        self.status_ip_txt.setFixedHeight(40)
         self.status_ip_txt.setAlignment(Qt.AlignCenter)
         self.on_off_butt.clicked.connect(self.start_animations)
 
@@ -90,17 +94,12 @@ class MainView(QMainWindow):
         control_box_1_widget = QWidget()
         control_box_1_widget.setObjectName("control_box_1_widget")
         control_box_1_widget.setStyleSheet("""
-            #control_box_1_widget {
-                border: 2px solid #000000; /* Black border */
-                background-color: #808080; /* Gray background */
-            }
-            
-            #control_box_1_widget QPushButton:hover {
-                background-color: #D3D3D3; /* Darker blue on hover */
-                border-radius: 5px;        /* Slightly rounded button corners */
-                
-            }
+            #control_box_1_widget {border: 3px solid #474747; background-color: #5b5b5b;}
+            #control_box_1_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px;}
+            #control_box_1_widget QPushButton:hover {background-color: #bcbcbc; border-radius: 5px;}
+            #control_box_1_widget QPushButton:pressed {background-color: #7f7f7f;}
         """)
+
         control_box_1_widget.setLayout(control_box_1)
         control_box_1_butt_group = QButtonGroup()
         control_box_1_butt_group.setExclusive(True)
@@ -136,12 +135,28 @@ class MainView(QMainWindow):
         control_box_2.addWidget(button_filt)
         control_box_2.addWidget(button_rms)
 
+        control_box_2_widget.setObjectName("control_box_2_widget")
+        control_box_2_widget.setStyleSheet("""
+                    #control_box_2_widget {border: 3px solid #474747; background-color: #5b5b5b;}
+                    #control_box_2_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px;}
+                    #control_box_2_widget QPushButton:hover {background-color: #bcbcbc; border-radius: 5px;}
+                    #control_box_2_widget QPushButton:pressed {background-color: #7f7f7f;}
+                """)
+
         control_box_3 = QVBoxLayout()
         control_box_3_widget = QWidget()
         control_box_3_widget.setLayout(control_box_3)
+
+        control_box_3_widget.setObjectName("control_box_3_widget")
+        control_box_3_widget.setStyleSheet("""
+                    #control_box_3_widget {border: 3px solid #474747; background-color: #5b5b5b;}
+                    #control_box_3_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px;}
+                    #control_box_3_widget QPushButton:hover {background-color: #bcbcbc; border-radius: 5px;}
+                    #control_box_3_widget QPushButton:pressed {background-color: #7f7f7f;}""")
+
         select_channels_label = QLabel("Select Channels")
-        select_channels_label.setFixedHeight(50)
-        select_channels_label.setStyleSheet("border: 2px solid white")
+        select_channels_label.setFixedHeight(40)
+        select_channels_label.setStyleSheet("border: 1px solid #ffffff ; background-color: #404040; border-radius: 5px;")
         select_channels_label.setAlignment(Qt.AlignCenter)
 
         check_group = QHBoxLayout()
@@ -180,7 +195,9 @@ class MainView(QMainWindow):
         control_box_3.addWidget(clear_selection_button)
 
         control_centre.addWidget(control_box_1_widget)
+        control_centre.addSpacing(10)
         control_centre.addWidget(control_box_2_widget)
+        control_centre.addSpacing(10)
         control_centre.addWidget(control_box_3_widget)
 
         ##vertical_layout.addWidget(self.status_ip_txt)
@@ -195,12 +212,12 @@ class MainView(QMainWindow):
 
         self.credits_butt = QPushButton("Credits")
         self.credits_butt.clicked.connect(self.show_credits_dialog)
-        export_butt = QPushButton("Export")
+
 
         bottom_bar.addWidget(self.control_button)
         bottom_bar.addWidget(self.credits_butt)
 
-        bottom_bar.addWidget(export_butt)
+
 
 
         vertical_layout.addLayout(bottom_bar)
