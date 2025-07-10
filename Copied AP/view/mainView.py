@@ -72,6 +72,13 @@ class MainView(QMainWindow):
         self.gif.setFixedSize(350, 180)
 
         self.my_audio_button = QPushButton("Mute")
+        self.my_audio_button.setObjectName("my_audio_button")
+        self.my_audio_button.setStyleSheet("""
+                                    #my_audio_button {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px;}
+                                    #my_audio_button:hover {background-color: #bcbcbc; border-radius: 5px;}
+                                    #my_audio_button:pressed {background-color: #7f7f7f;}
+                                    """)
+
         butt_box = QVBoxLayout()
         butt_box.addWidget(self.on_off_butt)
         butt_box.addWidget(self.my_audio_button)
@@ -152,7 +159,8 @@ class MainView(QMainWindow):
                     #control_box_3_widget {border: 3px solid #474747; background-color: #5b5b5b;}
                     #control_box_3_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px;}
                     #control_box_3_widget QPushButton:hover {background-color: #bcbcbc; border-radius: 5px;}
-                    #control_box_3_widget QPushButton:pressed {background-color: #7f7f7f;}""")
+                    #control_box_3_widget QPushButton:pressed {background-color: #7f7f7f;}
+                    """)
 
         select_channels_label = QLabel("Select Channels")
         select_channels_label.setFixedHeight(40)
@@ -209,12 +217,25 @@ class MainView(QMainWindow):
 
         bottom_bar = QHBoxLayout()
         self.control_button = QPushButton("Start Plotting")
+        self.control_button.setObjectName("control_button")
+        self.control_button.setStyleSheet("""
+                            #control_button {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px;}
+                            #control_button:hover {background-color: #bcbcbc; border-radius: 5px;}
+                            #control_button:pressed {background-color: #7f7f7f;}
+                            """)
 
         self.credits_butt = QPushButton("Credits")
+        self.credits_butt.setObjectName("credits_butt")
+        self.credits_butt.setStyleSheet("""
+                                    #credits_butt {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px;}
+                                    #credits_butt:hover {background-color: #bcbcbc; border-radius: 5px;}
+                                    #credits_butt:pressed {background-color: #7f7f7f;}
+                                    """)
         self.credits_butt.clicked.connect(self.show_credits_dialog)
 
 
         bottom_bar.addWidget(self.control_button)
+        bottom_bar.addSpacing(5)
         bottom_bar.addWidget(self.credits_butt)
 
 
