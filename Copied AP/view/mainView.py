@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from .plotView import VisPyPlotWidget
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from .credits import CreditsDialog
-from PyQt5.QtGui import QMovie
+from PyQt5.QtGui import QMovie, QFont
 from .audio import AudioController
 from viewmodel.mainViewModel import MainViewModel
 import sys
@@ -45,7 +45,7 @@ class MainView(QMainWindow):
         self.setCentralWidget(central_widget)
 
         ## sets a kuhl border so we can see the dingsdas
-        ##central_widget.setStyleSheet("border: 1px solid red;")
+        central_widget.setStyleSheet("border: 1px solid red;")
 
         main_horizontal_layout = QHBoxLayout()
         central_widget.setLayout(main_horizontal_layout)
@@ -72,8 +72,16 @@ class MainView(QMainWindow):
         butt_box.addWidget(self.on_off_butt)
         butt_box.addWidget(self.my_audio_button)
 
-        spacer = QSpacerItem(400, 100, QSizePolicy.Minimum, QSizePolicy.Fixed)
-        top_bar.addSpacerItem(spacer)
+        Werbung = QLabel("Hier könnte Ihre Werbung stehen")
+        Werbung.setFixedSize(400, 100)  # Same size as the original spacer
+        Werbung.setAlignment(Qt.AlignCenter)
+        Werbung.setWordWrap(True)
+
+        fontt = QFont("Arial", 20)
+        fontt.setBold(True)
+        Werbung.setFont(fontt)
+
+        top_bar.addWidget(Werbung)
         top_bar.addLayout(butt_box)
         top_bar.addWidget(self.gif)
 
