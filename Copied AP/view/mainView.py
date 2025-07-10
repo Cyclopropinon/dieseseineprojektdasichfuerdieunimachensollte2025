@@ -7,6 +7,7 @@ from .credits import CreditsDialog
 from PyQt5.QtGui import QMovie, QFontDatabase, QFont
 from .audio import AudioController
 from viewmodel.mainViewModel import MainViewModel
+import subprocess
 import sys
 import os
 
@@ -389,28 +390,31 @@ class MainView(QMainWindow):
         if self.diff_ch_state:
             self.diff_ch()
 
-
+    def show_error(self, message):
+        subprocess.run(['zenity', '--error', '--text', message])
 
 
     def indi_ch(self):
+        try:
+            # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+            self.plot_widget.clear_plots()
+            self.control_button.setText("Start Plotting")
+            self.view_model.stop_plotting()
+            # START NEW GIF OF STATIONARY CAT
+            gif_file = "view/cat stationary.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
+            self.movie.setPaused(True)
+            self.audio_controller.media_player.pause()
 
-        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
-        self.plot_widget.clear_plots()
-        self.control_button.setText("Start Plotting")
-        self.view_model.stop_plotting()
-        # START NEW GIF OF STATIONARY CAT
-        gif_file = "view/cat stationary.gif"
-        self.movie = QMovie(gif_file)
-        self.gif.setMovie(self.movie)
-        self.movie.start()
-        self.movie.setPaused(True)
-        self.audio_controller.media_player.pause()
-
-        self.button_group.setExclusive(True)
-        self.exclusive_state = True
-        self.diff_ch_state = False
-        self.clear_selec()
-        self.current_mode = "indi_ch"
+            self.button_group.setExclusive(True)
+            self.exclusive_state = True
+            self.diff_ch_state = False
+            self.clear_selec()
+            self.current_mode = "indi_ch"
+        except Exception as e:
+            self.show_error(f"An error occurred:\n{str(e)}")
 
     def clear_selec(self):
         """
@@ -432,74 +436,80 @@ class MainView(QMainWindow):
         print("All checkboxes cleared.")
 
     def diff_ch(self):
+        try:
+            # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+            self.plot_widget.clear_plots()
+            self.control_button.setText("Start Plotting")
+            self.view_model.stop_plotting()
+            # START NEW GIF OF STATIONARY CAT
+            gif_file = "view/cat stationary.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
+            self.movie.setPaused(True)
+            self.audio_controller.media_player.pause()
 
-        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
-        self.plot_widget.clear_plots()
-        self.control_button.setText("Start Plotting")
-        self.view_model.stop_plotting()
-        # START NEW GIF OF STATIONARY CAT
-        gif_file = "view/cat stationary.gif"
-        self.movie = QMovie(gif_file)
-        self.gif.setMovie(self.movie)
-        self.movie.start()
-        self.movie.setPaused(True)
-        self.audio_controller.media_player.pause()
+            self.button_group.setExclusive(False)
+            self.exclusive_state = False
+            self.current_mode = "diff_ch"
 
-        self.button_group.setExclusive(False)
-        self.exclusive_state = False
-        self.current_mode = "diff_ch"
+            if not self.diff_ch_state:
+                self.clear_selec()
 
-        if not self.diff_ch_state:
-            self.clear_selec()
+            self.diff_ch_state = True
 
-        self.diff_ch_state = True
+            if len(self.list_checked) > 2:
+                self.sender_button.setChecked(False)
+                self.list_checked.remove(self.sender_button)
 
-        if len(self.list_checked) > 2:
-            self.sender_button.setChecked(False)
-            self.list_checked.remove(self.sender_button)
-
+        except Exception as e:
+            self.show_error(f"An error occurred:\n{str(e)}")
 
 
     def freq_anal(self):
+        try:
+            # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+            self.plot_widget.clear_plots()
+            self.control_button.setText("Start Plotting")
+            self.view_model.stop_plotting()
+            # START NEW GIF OF STATIONARY CAT
+            gif_file = "view/cat stationary.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
+            self.movie.setPaused(True)
+            self.audio_controller.media_player.pause()
 
-        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
-        self.plot_widget.clear_plots()
-        self.control_button.setText("Start Plotting")
-        self.view_model.stop_plotting()
-        # START NEW GIF OF STATIONARY CAT
-        gif_file = "view/cat stationary.gif"
-        self.movie = QMovie(gif_file)
-        self.gif.setMovie(self.movie)
-        self.movie.start()
-        self.movie.setPaused(True)
-        self.audio_controller.media_player.pause()
-
-        self.button_group.setExclusive(True)
-        self.exclusive_state = True
-        self.diff_ch_state = False
-        self.clear_selec()
-        self.current_mode = "freq_ch"
-
+            self.button_group.setExclusive(True)
+            self.exclusive_state = True
+            self.diff_ch_state = False
+            self.clear_selec()
+            self.current_mode = "freq_ch"
+        except Exception as e:
+            self.show_error(f"An error occurred:\n{str(e)}")
 
     def multi_ch(self):
+        try:
+            # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
+            self.plot_widget.clear_plots()
+            self.control_button.setText("Start Plotting")
+            self.view_model.stop_plotting()
+            # START NEW GIF OF STATIONARY CAT
+            gif_file = "view/cat stationary.gif"
+            self.movie = QMovie(gif_file)
+            self.gif.setMovie(self.movie)
+            self.movie.start()
+            self.movie.setPaused(True)
+            self.audio_controller.media_player.pause()
 
-        # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
-        self.plot_widget.clear_plots()
-        self.control_button.setText("Start Plotting")
-        self.view_model.stop_plotting()
-        # START NEW GIF OF STATIONARY CAT
-        gif_file = "view/cat stationary.gif"
-        self.movie = QMovie(gif_file)
-        self.gif.setMovie(self.movie)
-        self.movie.start()
-        self.movie.setPaused(True)
-        self.audio_controller.media_player.pause()
+            self.button_group.setExclusive(False)
+            self.exclusive_state = False
+            self.diff_ch_state = False
+            self.clear_selec()
+            self.current_mode = "multi_ch"
+        except Exception as e:
+            self.show_error(f"An error occurred:\n{str(e)}")
 
-        self.button_group.setExclusive(False)
-        self.exclusive_state = False
-        self.diff_ch_state = False
-        self.clear_selec()
-        self.current_mode = "multi_ch"
 
 
 
