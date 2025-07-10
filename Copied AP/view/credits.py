@@ -12,7 +12,10 @@ class CreditsDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Credits")
         self.setMinimumWidth(500)
-        self.setMinimumHeight(300)# Set a minimum width for the dialog
+        self.setMinimumHeight(300) # Set a minimum width for the dialog
+
+        # Set the background color using a stylesheet
+        self.setStyleSheet("background-color: #323232; color: white;") # Set background and text color for readability
 
         # Create a vertical layout for the dialog content
         layout = QVBoxLayout()
@@ -20,7 +23,8 @@ class CreditsDialog(QDialog):
         # Add an image to the Credits Dialog
         self.dialog_image_label = QLabel(self)  # Create a QLabel for the image in the dialog
 
-
+        # Note: The image 'view/Sad_Cat_Thumbs_Up.png' is a local file.
+        # For this code to run, ensure the image exists at the specified path.
         dialog_pixmap = QPixmap('view/Sad_Cat_Thumbs_Up.png') # load a local image
 
         if not dialog_pixmap.isNull():
@@ -32,23 +36,17 @@ class CreditsDialog(QDialog):
         else:
             print("Error: Could not load image for dialog. Please check the path and file format.")
 
-        # Credit text
+        # Credit text - updated to ensure text color is visible on dark background
         credits_text = """
-        <h2 style='text-align: center;'>Credits</h2>
+        <h2 style='text-align: center; color: white;'>Credits</h2>
 
-        <h3>Developed By:</h3>
-        <ul>
+        <h3 style='color: white;'>Developed By:</h3>
+        <ul style='color: white;'>
             <li>Anshul Pandey</li>
             <li>Lorenz Taschner</li>
         </ul>
 
-        <h3>Special Thanks To:</h3>
-        <ul>
-            <li>Gemini :)</li>
-            
-        </ul>
-
-        <p style='text-align: center;'>&copy; 2025 All Rights Reserved.</p>
+        <p style='text-align: center; color: white;'>&copy; 2025 All Rights Reserved.</p>
         """
 
         # Create a QLabel to display the credit text
@@ -62,6 +60,11 @@ class CreditsDialog(QDialog):
 
         # Add an "OK" button to close the dialog
         ok_button = QPushButton("OK")
+        ok_button.setObjectName("ok_button")
+        ok_button.setStyleSheet("""#ok_button {background-color: #9f9f9f;}
+                                            #ok_button:hover {background-color: #bcbcbc;}
+                                            #ok_button:pressed {background-color: #7f7f7f;}
+                                            """)
         ok_button.clicked.connect(self.accept)  # Connect to the accept slot to close the dialog
 
         # Create a horizontal layout for the button to center it
