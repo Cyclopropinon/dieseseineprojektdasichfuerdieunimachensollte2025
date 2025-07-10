@@ -58,9 +58,15 @@ class MainView(QMainWindow):
         top_bar_widget.setLayout(top_bar)
         top_bar_widget.setFixedHeight(180)
 
-        self.on_off_butt = QPushButton("MAIN SWITCH")
+        self.on_off_butt = QPushButton("Start")
         self.on_off_butt.setFixedSize(100, 100);
-        self.on_off_butt.setStyleSheet("border-radius: 50%; background-color: lightgreen; border: 5px solid darkgreen;")
+        self.on_off_butt.setObjectName("startButton")
+        self.on_off_butt.setStyleSheet("""
+                    #startButton {background-color: #4CAF50;color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: none;}
+                    #startButton:hover {background-color: #45a049;}
+                """)
+
+
         self.status_ip_txt = QLabel("Status: DISCONNECTED  Host: ---------  Port: -----")
         self.status_ip_txt.setStyleSheet("border: 1px solid #ffffff ; background-color: #404040; border-radius: 5px;")
         self.status_ip_txt.setFixedHeight(40)
@@ -297,6 +303,11 @@ class MainView(QMainWindow):
     def start_animations(self):
         ## GIF
         if not self.is_connected:
+            self.on_off_butt.setStyleSheet("""
+                                            #startButton {background-color: #e21f1f; color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: none;}
+                                            #startButton:hover {background-color: #c91b1b;}
+                                        """)
+            self.on_off_butt.setText("Stop")
             self.status_ip_txt.setText("Status: CONNECTED  Host: localhost  Port: 12345")
             self.is_connected = True
             gif_file = "view/cat_waking_up.gif"
@@ -321,6 +332,11 @@ class MainView(QMainWindow):
             self.button_group.setExclusive(False)
 
         elif self.is_connected and self.plot_widget.cleared:
+            self.on_off_butt.setStyleSheet("""
+                                #startButton {background-color: #4CAF50;color: white;border-radius: 50px;font-size: 20px;font-weight: bold;border: none;}
+                                #startButton:hover {background-color: #45a049;}
+                            """)
+            self.on_off_butt.setText("Start")
             self.status_ip_txt.setText("Status: DISCONNECTED  Host: ---------  Port: -----")
             #STOP CONNECTION
             self.is_connected = False
