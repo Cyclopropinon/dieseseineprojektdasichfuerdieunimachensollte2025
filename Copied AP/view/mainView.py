@@ -425,19 +425,23 @@ class MainView(QMainWindow):
         Slot to uncheck all checkboxes in the exclusive button group.
         Temporarily disables exclusivity to allow unchecking, then re-enables it.
         """
-        # Temporarily set exclusive to False to allow unchecking multiple buttons
-        self.button_group.setExclusive(False)
+        try:
+            # Temporarily set exclusive to False to allow unchecking multiple buttons
+            self.button_group.setExclusive(False)
 
-        # Iterate through all buttons in the group and uncheck them
-        for button in self.list_checked:
-            button.setChecked(False)
-        self.list_checked.clear()
-        self.plot_widget.clear_plots()
+            # Iterate through all buttons in the group and uncheck them
+            for button in self.list_checked:
+                button.setChecked(False)
+            self.list_checked.clear()
+            self.plot_widget.clear_plots()
 
 
-        # Re-enable exclusivity
-        self.button_group.setExclusive(self.exclusive_state)
-        print("All checkboxes cleared.")
+            # Re-enable exclusivity
+            self.button_group.setExclusive(self.exclusive_state)
+            print("All checkboxes cleared.")
+        except Exception as e:
+            self.show_error(f"An error occurred:\n{str(e)}")
+
 
     def diff_ch(self):
         try:
