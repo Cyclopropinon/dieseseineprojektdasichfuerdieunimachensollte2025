@@ -358,6 +358,11 @@ class MainView(QMainWindow):
         button_name = int(self.sender_button.text())
         self.view_model.change_channel(button_name)
 
+        if self.sender_button in self.list_checked:
+            self.list_checked.remove(self.sender_button)
+        else:
+            self.list_checked.append(self.sender_button)
+
         #CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
         self.plot_widget.clear_plots()
         self.control_button.setText("Start Plotting")
