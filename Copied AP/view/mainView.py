@@ -91,6 +91,7 @@ class MainView(QMainWindow):
         butt_box.addWidget(self.my_audio_button)
 
         Werbung = QLabel("Hier könnte Ihre Werbung stehen")
+        Werbung.setStyleSheet("color: white;")
         Werbung.setFixedSize(400, 100)  # Same size as the original spacer
         Werbung.setAlignment(Qt.AlignCenter)
         Werbung.setWordWrap(True)
