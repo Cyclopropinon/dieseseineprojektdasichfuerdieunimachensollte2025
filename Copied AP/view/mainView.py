@@ -78,11 +78,15 @@ class MainView(QMainWindow):
         Werbung.setWordWrap(True)
 
         # Load custom font
-        font_id = QFontDatabase.addApplicationFont("view/werbung.ttf")
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        font_filename = "werbung.ttf"
+        programmatic_font_path = os.path.join(script_dir, font_filename)
+        font_id = QFontDatabase.addApplicationFont(programmatic_font_path)
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         fontt = QFont(font_family, 24)  # Set font size as needed
         fontt.setBold(True)
         Werbung.setFont(fontt)
+
 
         top_bar.addWidget(Werbung)
         top_bar.addLayout(butt_box)
