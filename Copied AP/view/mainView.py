@@ -69,7 +69,7 @@ class MainView(QMainWindow):
 
 
         self.status_ip_txt = QLabel("Status: DISCONNECTED  Host: ---------  Port: -----")
-        self.status_ip_txt.setStyleSheet("border: 1px solid #ffffff ; background-color: #404040; border-radius: 5px; color: white;")
+        self.status_ip_txt.setStyleSheet("border: 1px solid #ffffff ; background-color: #404040; border-radius: 5px; color: white; font-weight: bold;")
         self.status_ip_txt.setFixedHeight(40)
         self.status_ip_txt.setAlignment(Qt.AlignCenter)
         self.on_off_butt.clicked.connect(self.start_animations)
@@ -81,7 +81,7 @@ class MainView(QMainWindow):
         self.my_audio_button = QPushButton("Mute")
         self.my_audio_button.setObjectName("my_audio_button")
         self.my_audio_button.setStyleSheet("""
-                                    #my_audio_button {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white;}
+                                    #my_audio_button {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white; font-weight: bold;}
                                     #my_audio_button:hover {background-color: #bcbcbc; border-radius: 5px;}
                                     #my_audio_button:pressed {background-color: #7f7f7f;}
                                     """)
@@ -124,7 +124,7 @@ class MainView(QMainWindow):
         control_box_1_widget.setObjectName("control_box_1_widget")
         control_box_1_widget.setStyleSheet("""
             #control_box_1_widget {border: 3px solid #474747; background-color: #5b5b5b;}
-            #control_box_1_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white;}
+            #control_box_1_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white; font-weight: bold;}
             #control_box_1_widget QPushButton:hover {background-color: #bcbcbc; border-radius: 5px;}
             #control_box_1_widget QPushButton:pressed {background-color: #7f7f7f;}
         """)
@@ -167,7 +167,7 @@ class MainView(QMainWindow):
         control_box_2_widget.setObjectName("control_box_2_widget")
         control_box_2_widget.setStyleSheet("""
                     #control_box_2_widget {border: 3px solid #474747; background-color: #5b5b5b;}
-                    #control_box_2_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white;}
+                    #control_box_2_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white; font-weight: bold;}
                     #control_box_2_widget QPushButton:hover {background-color: #bcbcbc; border-radius: 5px;}
                     #control_box_2_widget QPushButton:pressed {background-color: #7f7f7f;}
                 """)
@@ -179,15 +179,15 @@ class MainView(QMainWindow):
         control_box_3_widget.setObjectName("control_box_3_widget")
         control_box_3_widget.setStyleSheet("""
                     #control_box_3_widget {border: 3px solid #474747; background-color: #5b5b5b;}
-                    #control_box_3_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white;}
+                    #control_box_3_widget QPushButton {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white; font-weight: bold;}
                     #control_box_3_widget QPushButton:hover {background-color: #bcbcbc; border-radius: 5px;}
                     #control_box_3_widget QPushButton:pressed {background-color: #7f7f7f;}
-                    #control_box_3_widget QCheckBox {color: white;}
+                    #control_box_3_widget QCheckBox {color: white; font-weight: bold;}
                     """)
 
         select_channels_label = QLabel("Select Channels")
         select_channels_label.setFixedHeight(40)
-        select_channels_label.setStyleSheet("border: 1px solid #ffffff ; background-color: #404040; border-radius: 5px; color: white;")
+        select_channels_label.setStyleSheet("border: 1px solid #ffffff ; background-color: #404040; border-radius: 5px; color: white; font-weight: bold;")
         select_channels_label.setAlignment(Qt.AlignCenter)
 
         check_group = QHBoxLayout()
@@ -242,7 +242,7 @@ class MainView(QMainWindow):
         self.control_button = QPushButton("Start Plotting")
         self.control_button.setObjectName("control_button")
         self.control_button.setStyleSheet("""
-                            #control_button {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white;}
+                            #control_button {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white; font-weight: bold;}
                             #control_button:hover {background-color: #bcbcbc; border-radius: 5px;}
                             #control_button:pressed {background-color: #7f7f7f;}
                             """)
@@ -250,7 +250,7 @@ class MainView(QMainWindow):
         self.credits_butt = QPushButton("Credits")
         self.credits_butt.setObjectName("credits_butt")
         self.credits_butt.setStyleSheet("""
-                                    #credits_butt {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white;}
+                                    #credits_butt {background-color: #9f9f9f; border-radius: 5px; padding: 3px 6px; color: white; font-weight: bold;}
                                     #credits_butt:hover {background-color: #bcbcbc; border-radius: 5px;}
                                     #credits_butt:pressed {background-color: #7f7f7f;}
                                     """)
