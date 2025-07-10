@@ -46,7 +46,7 @@ class MainView(QMainWindow):
         self.setCentralWidget(central_widget)
 
         ## sets a kuhl border so we can see the dingsdas
-        central_widget.setStyleSheet("border: 1px solid red;")
+        #central_widget.setStyleSheet("border: 1px solid red;")
 
         main_horizontal_layout = QHBoxLayout()
         central_widget.setLayout(main_horizontal_layout)
@@ -84,7 +84,7 @@ class MainView(QMainWindow):
         programmatic_font_path = os.path.join(script_dir, font_filename)
         font_id = QFontDatabase.addApplicationFont(programmatic_font_path)
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        fontt = QFont(font_family, 24)  # Set font size as needed
+        fontt = QFont(font_family, 30)  # Set font size as needed
         fontt.setBold(True)
         Werbung.setFont(fontt)
 
