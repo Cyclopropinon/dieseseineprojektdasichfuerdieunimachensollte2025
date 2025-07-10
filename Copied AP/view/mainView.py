@@ -418,7 +418,7 @@ class MainView(QMainWindow):
             self.clear_selec()
             self.current_mode = "indi_ch"
         except Exception as e:
-            self.show_error(f"An error occurred:\n{str(e)}")
+            self.show_error(f"Stoopit bitch, you forgor to switsch on the main button!")
 
     def clear_selec(self):
         """
@@ -440,7 +440,7 @@ class MainView(QMainWindow):
             self.button_group.setExclusive(self.exclusive_state)
             print("All checkboxes cleared.")
         except Exception as e:
-            self.show_error(f"An error occurred:\n{str(e)}")
+            self.show_error(f"Stoopit bitch, you forgor to switsch on the main button!")
 
 
     def diff_ch(self):
@@ -471,7 +471,7 @@ class MainView(QMainWindow):
                 self.list_checked.remove(self.sender_button)
 
         except Exception as e:
-            self.show_error(f"An error occurred:\n{str(e)}")
+            self.show_error(f"Stoopit bitch, you forgor to switsch on the main button!")
 
 
     def freq_anal(self):
@@ -494,7 +494,7 @@ class MainView(QMainWindow):
             self.clear_selec()
             self.current_mode = "freq_ch"
         except Exception as e:
-            self.show_error(f"An error occurred:\n{str(e)}")
+            self.show_error(f"Stoopit bitch, you forgor to switsch on the main button!")
 
     def multi_ch(self):
         try:
@@ -516,7 +516,7 @@ class MainView(QMainWindow):
             self.clear_selec()
             self.current_mode = "multi_ch"
         except Exception as e:
-            self.show_error(f"An error occurred:\n{str(e)}")
+            self.show_error(f"Stoopit bitch, you forgor to switsch on the main button!")
 
 
 
