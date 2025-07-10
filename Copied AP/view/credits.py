@@ -46,11 +46,6 @@ class CreditsDialog(QDialog):
             <li>Lorenz Taschner</li>
         </ul>
 
-        <h3 style='color: white;'>Special Thanks To:</h3>
-        <ul style='color: white;'>
-            <li>Gemini :)</li>
-        </ul>
-
         <p style='text-align: center; color: white;'>&copy; 2025 All Rights Reserved.</p>
         """
 
