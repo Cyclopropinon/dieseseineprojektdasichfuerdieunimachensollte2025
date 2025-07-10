@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.signal as signal
 
 class SignalProcessor:
     """
@@ -15,7 +16,7 @@ class SignalProcessor:
         points_per_window (int): Total number of points in the display window
     """
     
-    def __init__(self, window_size=10, sampling_rate=2048):
+    def __init__(self, sampling_rate=545.5, window_size=10):
         """
         Initialize the signal processor with window and sampling parameters.
         
@@ -33,32 +34,34 @@ class SignalProcessor:
     def calculate_rms(self, data):
         """
         Calculate the Root Mean Square (RMS) of the signal.
-        
+
         Args:
             data (np.ndarray): Input signal data
             window_size (int, optional): Size of the RMS window in samples
-            
+
         Returns:
             np.ndarray: RMS values
         """
-        #if window_size is None:
-        window_size = self.points_per_window
-            
+        if self.window_size is None:
+            window_size = self.points_per_window
+        else:
+            window_size = self.window_size
+
         # Calculate RMS using rolling window
         rms = np.zeros_like(data)
         for i in range(len(data)):
             start_idx = max(0, i - window_size + 1)
             window = data[start_idx:i + 1]
             rms[i] = np.sqrt(np.mean(window ** 2))
-            
+
         return rms
     
     def butter_filter(self, data):
-        t = np.arange(channel_data.shape[1]) / sampling_rate
+        #t = np.arange(data.shape[1]) / sampling_rate
         # Apply bandpass filter
-        nyquist = sampling_rate / 2
+        nyquist = self.sampling_rate / 2
         low = 20 / nyquist
-        high = 450 / nyquist
+        high = 250 / nyquist
         b, a = signal.butter(4, [low, high], btype='band')
-        filtered_data = signal.filtfilt(b, a, channel_data[20, :])
+        filtered_data = signal.filtfilt(b, a, data)
         return filtered_data
