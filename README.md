@@ -9,6 +9,10 @@ This is a PyQt5 application for real-time visualization of 32-channel signal dat
 
 1). TCP Communication:
   - Handles data chunks of 32 channels × 18 samples
+  - Data format: Each chunk contains:
+     - 32 channels of data
+     - 18 samples per channel
+     - Total chunk size: 32 × 18 = 576 values
     
 2). Live Plotting using VisPy:
   - With Channel Selection mechanism
@@ -32,6 +36,46 @@ This is a PyQt5 application for real-time visualization of 32-channel signal dat
 
 7). Zenity Error Management:
   - For a better user experience
+
+## File Structure:
+
+    dieseseineprojektdasichfuerdieunimachensollte2025/
+    ├── main.py
+    ├── recording.pkl
+    ├── run.sh
+    ├── README.md
+    ├── view/
+    |   ├── mainView.py
+    |   ├── plotView.py
+    |   ├── credits.py
+    |   ├── audio.py
+    |   ├── nyancat.gif
+    |   ├── Sad_Cat_Thumbs_Up.png
+    |   ├── Nyan Cat.mp3
+    |   ├── cat_waking_up.gif
+    |   ├── cat-meow-6226.mpy
+    |   ├── cat stationary.gif
+    |   ├── cat_sleep_running.gif
+    |   ├── cat_goingtosleep.gif
+    |   └── wrbung.ttf
+    ├── viewmodel/
+    |   └── mainViewModel.py
+    ├── services/
+    |   ├── tcp_server.py
+    |   └── tcp_client.py
+    └── Signalverarbeitung/
+        └── signal_processor.py
+
+
+
+
+
+
+
+
+
+
+
 
 ## Dependencies:
 - matplotlib
