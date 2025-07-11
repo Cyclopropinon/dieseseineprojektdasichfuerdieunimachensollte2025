@@ -15,41 +15,25 @@ import os
 class MainView(QMainWindow):
     """
     Main application window that combines the plot widget and controls.
-
-    This class is part of the View layer in the MVVM architecture. It:
-    - Creates and manages the main window layout
-    - Contains the plot widget and control buttons
-    - Connects the ViewModel signals to the View
-    - Handles user interactions
-
-    The window provides a simple interface with:
-    - A plot widget showing the live signal
-    - A button to start/stop the plotting
     """
 
     def __init__(self):
         """
         Initialize the main window with plot widget and controls.
-
-        Args:
-            view_model: The ViewModel that manages the data and plotting state
         """
         super().__init__()
 
-        # Set up the main window
         self.setWindowTitle("VeryCreativeProjectName")
         self.setGeometry(0, 0, 800, 600)
-        self.showMaximized()  # Enters max screen mode
+        self.showMaximized()
         ##self.showFullScreen() #Enters Full Screen
-
-        # Create central widget and layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
         self.setStyleSheet("""QMainWindow {background-color: #323232; /* Dark Grey */}""")
 
         ## sets a kuhl border so we can see the dingsdas
-        #central_widget.setStyleSheet("border: 1px solid red;")
+        ##central_widget.setStyleSheet("border: 1px solid red;")
 
         main_horizontal_layout = QHBoxLayout()
         central_widget.setLayout(main_horizontal_layout)
@@ -92,20 +76,18 @@ class MainView(QMainWindow):
 
         Werbung = QLabel("Hier könnte Ihre Werbung stehen")
         Werbung.setStyleSheet("color: white;")
-        Werbung.setFixedSize(400, 100)  # Same size as the original spacer
+        Werbung.setFixedSize(400, 100)
         Werbung.setAlignment(Qt.AlignCenter)
         Werbung.setWordWrap(True)
 
-        # Load custom font
         script_dir = os.path.dirname(os.path.abspath(__file__))
         font_filename = "werbung.ttf"
         programmatic_font_path = os.path.join(script_dir, font_filename)
         font_id = QFontDatabase.addApplicationFont(programmatic_font_path)
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        fontt = QFont(font_family, 30)  # Set font size as needed
+        fontt = QFont(font_family, 30)
         fontt.setBold(True)
         Werbung.setFont(fontt)
-
 
         top_bar.addWidget(Werbung)
         top_bar.addLayout(butt_box)
@@ -232,7 +214,6 @@ class MainView(QMainWindow):
         control_centre.addSpacing(10)
         control_centre.addWidget(control_box_3_widget)
 
-        ##vertical_layout.addWidget(self.status_ip_txt)
         self.plot_widget = VisPyPlotWidget()
         vertical_layout.addWidget(self.plot_widget)
         button_raw.clicked.connect(lambda: self.plot_widget.set_filter(0))
@@ -257,16 +238,11 @@ class MainView(QMainWindow):
                                     """)
         self.credits_butt.clicked.connect(self.show_credits_dialog)
 
-
         bottom_bar.addWidget(self.control_button)
         bottom_bar.addSpacing(5)
         bottom_bar.addWidget(self.credits_butt)
 
-
-
-
         vertical_layout.addLayout(bottom_bar)
-
 
         main_horizontal_layout.addWidget(control_centre_widget)
         main_horizontal_layout.addLayout(vertical_layout)
@@ -274,13 +250,11 @@ class MainView(QMainWindow):
         self.current_mode = ""
         self.is_connected = False
 
-
-
-
     def toggle_plotting(self):
         """
         Toggle the plotting state and update button text.
         """
+
         if self.view_model.is_plotting:
             self.control_button.setText("Start Plotting")
             self.view_model.stop_plotting()
@@ -296,18 +270,16 @@ class MainView(QMainWindow):
 
     def show_credits_dialog(self):
         """
-        Slot method to create and show the CreditsDialog when the button is clicked.
+        method to create and show the CreditsDialog when the button is clicked.
         """
-        # Create an instance of the CreditsDialog, passing self as the parent
+
         credits_dialog = CreditsDialog(self)
-        # Show the dialog modally (blocks interaction with parent window until closed)
         credits_dialog.exec_()
 
 
     def update_audio_button_ui(self, state: QMediaPlayer.State):
         """
         Updates the UI of the audio button based on the AudioController's state.
-        This method is a slot connected to the AudioController's audio_state_changed signal.
         """
         if state == QMediaPlayer.PlayingState:
             if self.audio_controller.get_volume() != 0:
@@ -315,10 +287,12 @@ class MainView(QMainWindow):
             else:
                 self.my_audio_button.setText("Unmute")
                 self.my_audio_button.setEnabled(True)
-            # Only enable if media content was successfully loaded by the controller
             self.my_audio_button.setEnabled(self.audio_controller.is_media_loaded())
 
     def start_animations(self):
+        """
+        is called when the start button is clicked.
+        """
         ## GIF
         if not self.is_connected:
             self.on_off_butt.setStyleSheet("""
@@ -400,6 +374,9 @@ class MainView(QMainWindow):
             self.plot_widget.clear_plots()
 
     def plotting_connected(self):
+        """
+        called when the client is connected to the server and the plotting is active
+        """
         ## GIF
         gif_file = "view/nyancat.gif"
         self.movie = QMovie(gif_file)
@@ -418,6 +395,9 @@ class MainView(QMainWindow):
 
 
     def init_audio (self, audio_file):
+        """
+        audio initialization
+        """
         self.audio_file_path = os.path.join(os.getcwd(), audio_file)
         self.audio_controller = AudioController(self.audio_file_path, parent=self)
         self.my_audio_button.clicked.connect(self.audio_controller.toggle_playback)
@@ -431,6 +411,9 @@ class MainView(QMainWindow):
         self.current_file = audio_file
 
     def link_channel(self):
+        """
+        links the checkboxes to the channels. called when the checkboxes are clicked
+        """
         self.sender_button = self.sender()
         button_name = int(self.sender_button.text())
         self.view_model.change_channel(button_name)
@@ -460,6 +443,9 @@ class MainView(QMainWindow):
 
 
     def indi_ch(self):
+        """
+        runs when the plot individial channels button is clicked
+        """
         try:
             # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
             self.plot_widget.clear_plots()
@@ -483,21 +469,14 @@ class MainView(QMainWindow):
 
     def clear_selec(self):
         """
-        Slot to uncheck all checkboxes in the exclusive button group.
-        Temporarily disables exclusivity to allow unchecking, then re-enables it.
+        uncheck all checkboxes in the exclusive button group.
         """
         try:
-            # Temporarily set exclusive to False to allow unchecking multiple buttons
             self.button_group.setExclusive(False)
-
-            # Iterate through all buttons in the group and uncheck them
             for button in self.list_checked:
                 button.setChecked(False)
             self.list_checked.clear()
             self.plot_widget.clear_plots()
-
-
-            # Re-enable exclusivity
             self.button_group.setExclusive(self.exclusive_state)
             print("All checkboxes cleared.")
         except Exception as e:
@@ -505,6 +484,9 @@ class MainView(QMainWindow):
 
 
     def diff_ch(self):
+        """
+        runs when the differential channels button is clicked
+        """
         try:
             # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
             self.plot_widget.clear_plots()
@@ -536,6 +518,9 @@ class MainView(QMainWindow):
 
 
     def freq_anal(self):
+        """
+        runs when the frequency domain analysis button is clicked
+        """
         try:
             # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
             self.plot_widget.clear_plots()
@@ -558,6 +543,9 @@ class MainView(QMainWindow):
             self.show_error(f"Stoopit [nice person], you forgor to switsch on the main button!")
 
     def multi_ch(self):
+        """
+        runs when the multiple channel plotting button is clicked
+        """
         try:
             # CLEAR PLOT AND STOP PLOTTING AND CHANGE BUTTON TEXT
             self.plot_widget.clear_plots()

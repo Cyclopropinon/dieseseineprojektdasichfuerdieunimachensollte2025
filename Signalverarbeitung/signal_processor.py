@@ -5,11 +5,6 @@ class SignalProcessor:
     """
     A class that generates and processes signal data for live plotting.
     
-    This class is part of the Model layer in the MVVM architecture. It handles:
-    - Signal generation with specified parameters
-    - Signal processing and window management
-    - No UI or visualization logic
-    
     Attributes:
         window_size (int): Size of the display window in seconds
         sampling_rate (int): Number of samples per second (Hz)
@@ -22,25 +17,21 @@ class SignalProcessor:
         
         Args:
             window_size (int): Size of the display window in seconds (default: 10)
-            sampling_rate (int): Sampling rate in Hz (default: 2048)
+            sampling_rate (int): Sampling rate in Hz (default: 545.5)
         """
         self.window_size = window_size
         self.sampling_rate = sampling_rate
         self.points_per_window = window_size * sampling_rate
         
     def antifilter(self, data):
+        """
+        Returns the raw data
+        """
         return data
         
     def calculate_rms(self, data):
         """
-        Calculate the Root Mean Square (RMS) of the signal.
-
-        Args:
-            data (np.ndarray): Input signal data
-            window_size (int, optional): Size of the RMS window in samples
-
-        Returns:
-            np.ndarray: RMS values
+        Calculates the Root Mean Square (RMS) of the signal.
         """
         if self.window_size is None:
             window_size = self.points_per_window
@@ -57,8 +48,9 @@ class SignalProcessor:
         return rms
     
     def butter_filter(self, data):
-        #t = np.arange(data.shape[1]) / sampling_rate
-        # Apply bandpass filter
+        """
+        Applies the bandpass filter
+        """
         nyquist = self.sampling_rate / 2
         low = 20 / nyquist
         high = 250 / nyquist
