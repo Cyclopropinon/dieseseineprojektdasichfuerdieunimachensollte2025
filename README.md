@@ -1,123 +1,116 @@
-# Live Plotting Demo
+# Applied Programming - Final Project
 
-This project demonstrates real-time data visualization using the MVVM (Model-View-ViewModel) architecture pattern and VisPy for high-performance plotting.
 
-## MVVM Architecture
+## Overview:
 
-### What is MVVM?
-MVVM (Model-View-ViewModel) is an architectural pattern that separates an application into three main components:
+This is a PyQt5 application for real-time visualization of 32-channel signal data, which uses an MVVM architecture pattern.
 
-1. **Model**: Handles data and business logic
-   - In our case: `SignalProcessor` class that generates and processes the signal data
-   - Contains no UI or presentation logic
-   - Independent of how data is displayed
+## Application Features:
 
-2. **View**: User interface and visualization
-   - In our case: `MainWindow` and `VisPyPlotWidget` classes
-   - Only handles UI elements and user interactions
-   - Doesn't know about data processing
+1). TCP Communication:
+  - Handles data chunks of 32 channels × 18 samples
+  - Data format: Each chunk contains:
+     - 32 channels of data
+     - 18 samples per channel
+     - Total chunk size: 32 × 18 = 576 values
+    
+2). Live Plotting using VisPy:
+  - With Channel Selection mechanism
+  - Multi-Channel Plotting
+  - Frequency Domain Analysis
+  - Differential (Bipolar) Channel Analysis
+    
+3). Data Visualisation:
+  - Raw Signal
+  - Filtered Signal
+  - RMS Signal
 
-3. **ViewModel**: Connects Model and View
-   - In our case: `PlotViewModel` class
-   - Transforms data from Model into a format the View can display
-   - Handles UI logic and state management
-   - Uses signals/events to notify View of changes
+4). Server-Client Control Button:
+  - For efficient data transmission
 
-### Advantages of MVVM
-- **Separation of Concerns**: Each component has a specific responsibility
-- **Testability**: Components can be tested independently
-- **Maintainability**: Changes in one component don't affect others
-- **Reusability**: Components can be reused in different contexts
-- **Scalability**: Easy to add new features without changing existing code
+5). Start/Stop Plotting Button:
+  - For better data analysis
 
-### Disadvantages of MVVM
-- **Complexity**: More initial setup required
-- **Learning Curve**: New developers need to understand the pattern
-- **Overhead**: Might be overkill for simple applications
+6). Status Bar:
+  - To display the current status of the connection
 
-### When to Use MVVM
-- Complex applications with multiple views
-- Applications requiring frequent UI updates
-- Projects where testability is important
-- Applications with complex business logic
-- When working in a team
+7). Zenity Error Management:
+  - For a better user experience
 
-## Live Plotting
+## File Structure:
 
-### Why VisPy Instead of Matplotlib?
-1. **Performance**: 
-   - VisPy uses OpenGL for rendering, making it much faster
-   - Can handle thousands of data points at 30+ FPS
-   - Matplotlib would struggle with real-time updates
+    dieseseineprojektdasichfuerdieunimachensollte2025/
+    ├── main.py
+    ├── recording.pkl
+    ├── run.sh
+    ├── README.md
+    ├── view/
+    |   ├── mainView.py
+    |   ├── plotView.py
+    |   ├── credits.py
+    |   ├── audio.py
+    |   ├── nyancat.gif
+    |   ├── Sad_Cat_Thumbs_Up.png
+    |   ├── Nyan Cat.mp3
+    |   ├── cat_waking_up.gif
+    |   ├── cat-meow-6226.mpy
+    |   ├── cat stationary.gif
+    |   ├── cat_sleep_running.gif
+    |   ├── cat_goingtosleep.gif
+    |   └── wrbung.ttf
+    ├── viewmodel/
+    |   └── mainViewModel.py
+    ├── services/
+    |   ├── tcp_server.py
+    |   └── tcp_client.py
+    └── Signalverarbeitung/
+        └── signal_processor.py
 
-2. **Real-time Capabilities**:
-   - VisPy is designed for real-time visualization
-   - Matplotlib is better for static plots
-   - VisPy has lower latency for updates
 
-3. **Memory Usage**:
-   - VisPy is more memory efficient
-   - Matplotlib creates new objects for each update
-   - VisPy reuses buffers for better performance
 
-### How Live Plotting Works
-1. **Data Generation**:
-   - Signal is generated at 2048 Hz (samples per second)
-   - Total signal length is 60 seconds
-   - Window shows 10 seconds at a time
 
-2. **Update Mechanism**:
-   - Timer triggers updates at 30 Hz
-   - Each update shifts the data window
-   - Fixed time window (0-10s) moves through the data
-   - Smooth visualization with minimal CPU usage
 
-3. **Performance Considerations**:
-   - Fixed window size prevents memory growth
-   - Efficient data structures (numpy arrays)
-   - OpenGL-based rendering for smooth updates
 
-## Project Structure
-```
-live_plotting/
-├── main.py              # Application entry point
-├── services/            # Model layer
-│   └── signal_processor.py
-├── view/               # View layer
-│   ├── main_window.py
-│   └── plot_widget.py
-└── viewmodel/          # ViewModel layer
-    └── plot_viewmodel.py
-```
 
-## Requirements
-- Python 3.8+
-- PyQt5
-- VisPy
-- NumPy
 
-## Installation
-1. Create virtual environment:
-   ```bash
-   python -m venv .venv
-   ```
 
-2. Activate virtual environment:
-   - Windows: `.venv\Scripts\activate`
-   - Linux/Mac: `source .venv/bin/activate`
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
 
-## Running the Application
-```bash
-python main.py
-```
 
-## Usage
-1. Click "Start Plotting" to begin visualization
-2. The plot shows a 10-second window of data
-3. The signal moves through the window in real-time
-4. Click "Stop Plotting" to pause the visualization 
+## Dependencies:
+- matplotlib
+- numpy
+- pyqt5
+- scipy
+- vispy
+- zenity
+
+## How to use the program??
+
+Step 1 --> Run the 'run.sh' file.
+
+Step 2 --> Click the green 'Start' button to connect the TCP Client to the server.
+
+Step 3 --> Select one of the four available functions located in the top-left of the window.
+
+Step 4 --> Select either 'Raw Signal', 'Filtered Signal', or 'RMS Signal'
+
+Step 5 --> Select the channels that need to be plotted.
+           
+- Plot Individual Channels -- Only 1 channel can be selected.
+- Differential Channels -- Only 2 channels can be selected. The channel selected last will be subtracted from the channel that is                  selected first.
+- Frequency Domain Analysis -- Only 1 channel can be selected.
+- Cross-Channel Analysis -- Any number of channels can be selected. (The more channels selected, the more laggy the program becomes!)
+
+Step 6 --> Click the 'Start/Stop Button' to start the plotting or to pause the plotting.
+
+## Additional Instructions:
+
+1). Please turn your display into 'Dark/Night Mode' for a better user experience.
+
+2). Use the Mute/Unmute button to mute/unmute the audio.
+
+3). Click the credits button to view the credits for this project.
+
+4). Click the 'Clear Selection' button to clear the channel checkboxes.
+
