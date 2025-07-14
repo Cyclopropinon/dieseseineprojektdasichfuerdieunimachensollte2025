@@ -114,15 +114,3 @@ Step 6 --> Click the 'Start/Stop Button' to start the plotting or to pause the p
 
 4). Click the 'Clear Selection' button to clear the channel checkboxes.
 
-
-
-
-
-
-
-
-
-
-
-
-           
